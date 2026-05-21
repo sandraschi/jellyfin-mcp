@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+*.egg
+
+# Environment
+.env
+!.env.example
+
+# Logs
+logs/
+*.log
+
+# Node
+node_modules/
+.next/
+out/
+
+# Tauri
+native/binaries/
+native/target/
+native/gen/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Test
+.pytest_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+coverage.xml
+
+# Secrets
+config/secrets/
+
+# OS
+.DS_Store
+Thumbs.db

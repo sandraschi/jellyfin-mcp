@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --jf-purple: #AA5CC3;
+  --jf-purple-dark: #8B3FAF;
+  --jf-purple-light: #C48FD8;
+  --jf-blue: #00A4DC;
+  --jf-blue-dark: #0089B8;
+  --jf-blue-light: #33C0E8;
+  --jf-dark: #101020;
+  --jf-darker: #0A0A14;
+  --jf-surface: #1A1A2E;
+  --jf-surface-light: #252540;
+  --jf-surface-lighter: #303050;
+  --jf-text: #E8E8F0;
+  --jf-text-muted: #8888A0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--jf-darker);
+  color: var(--jf-text);
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--jf-darker);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--jf-surface-lighter);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--jf-purple-dark);
+}
+
+@layer components {
+  .glass {
+    background: rgba(26, 26, 46, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-hover:hover {
+    background: rgba(37, 37, 64, 0.6);
+    border-color: rgba(170, 92, 195, 0.3);
+  }
+
+  .card {
+    @apply rounded-xl border border-[#ffffff10] bg-jellyfin-surface p-6;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .card:hover {
+    border-color: rgba(170, 92, 195, 0.25);
+    box-shadow: 0 4px 24px rgba(170, 92, 195, 0.08);
+  }
+
+  .btn-primary {
+    @apply rounded-lg px-4 py-2 font-medium text-white transition-all duration-200;
+    background: linear-gradient(135deg, var(--jf-purple), var(--jf-purple-dark));
+  }
+
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--jf-purple-light), var(--jf-purple));
+    box-shadow: 0 0 20px rgba(170, 92, 195, 0.3);
+  }
+
+  .btn-secondary {
+    @apply rounded-lg border border-[#ffffff15] px-4 py-2 font-medium text-white transition-all duration-200;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(170, 92, 195, 0.4);
+    background: rgba(170, 92, 195, 0.08);
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  .badge-purple {
+    background: rgba(170, 92, 195, 0.15);
+    color: var(--jf-purple-light);
+  }
+
+  .badge-blue {
+    background: rgba(0, 164, 220, 0.15);
+    color: var(--jf-blue-light);
+  }
+
+  .input-field {
+    @apply w-full rounded-lg border border-[#ffffff10] bg-jellyfin-surface px-4 py-2.5 text-sm text-white placeholder-[#666680] transition-colors duration-200 focus:border-jellyfin-purple focus:outline-none focus:ring-1 focus:ring-jellyfin-purple;
+  }
+}
