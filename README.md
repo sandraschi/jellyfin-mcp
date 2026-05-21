@@ -59,23 +59,25 @@ just webapp
 ### For Users
 | Doc | Content |
 |---|---|
-| [Install & Setup](docs/INSTALL.md) | Prerequisites, Jellyfin server setup, API key, installation |
-| [Claude Desktop Config](docs/MCP_SETUP.md) | MCP client configuration, transport modes, env vars |
-| [Configuration](docs/CONFIG.md) | All environment variables, settings, `.env` format |
+| [Jellyfin Server Install](docs/JELLYFIN_SERVER.md) | Full Jellyfin setup — Windows, Docker, Linux, NAS, HW acceleration, media folders |
+| [jellyfin-mcp Install](docs/INSTALL.md) | Python deps, API key, uv install, verify |
+| [Claude Desktop Config](docs/MCP_SETUP.md) | MCP client configuration, transport modes, env vars, troubleshooting |
+| [Configuration](docs/CONFIG.md) | All environment variables, `.env` format, CLI args |
 | [MCP Tools Reference](docs/TOOLS.md) | All 22 portmanteau tools with operations, params, examples |
-| [Webapp Guide](docs/WEBAPP.md) | Dashboard features, pages, WebSocket live playback, screenshots |
-| [Plugin Management](docs/PLUGINS.md) | Plugin catalog, install/configure/uninstall via MCP + webapp |
+| [Webapp Guide](docs/WEBAPP.md) | Dashboard pages, WebSocket live playback, theme |
+| [Plugin Management](docs/PLUGINS.md) | Catalog, install/configure/uninstall, top plugins |
 | [Live TV & DVR](docs/LIVE_TV.md) | EPG guide, recordings, tuners, channel management |
-| [RAG Semantic Search](docs/RAG.md) | Metadata indexing, natural-language search, LanceDB |
-| [LLM & Agentic](docs/SAMPLING.md) | Sampling config, agentic workflows, chat in webapp |
-| [Plex Migration](docs/PLEX_MIGRATION.md) | Export from Plex, import to Jellyfin, watch state sync |
+| [RAG Semantic Search](docs/RAG.md) | Metadata indexing, natural-language search |
+| [LLM & Agentic](docs/SAMPLING.md) | Sampling config, agentic workflows, webapp chat |
+| [Plex Migration](docs/PLEX_MIGRATION.md) | Phase-by-phase conversion walkthrough, watch state sync, pitfalls |
 | [Tauri Desktop App](docs/TAURI.md) | Native wrapper, sidecar, installer, build pipeline |
+| [FAQ](docs/FAQ.md) | Common issues, troubleshooting, performance tips |
 
 ### For Developers
 | Doc | Content |
 |---|---|
-| [Architecture](docs/ARCHITECTURE.md) | System design, component breakdown, data flow, comparison with plex-mcp |
-| [Development](docs/DEVELOPMENT.md) | Dev setup, justfile, lint/test, contributing |
+| [Architecture](docs/ARCHITECTURE.md) | System diagram, components, data flow, plex-mcp comparison |
+| [Development](docs/DEVELOPMENT.md) | Dev setup, justfile commands, adding tools, fleet standards |
 | [Deep Dive PRD](https://github.com/sandraschi/mcp-central-docs/blob/main/projects/jellyfin-mcp/PRD.md) | Full product requirements, politicolegal analysis (in mcp-central-docs) |
 | [Full Architecture](https://github.com/sandraschi/mcp-central-docs/blob/main/projects/jellyfin-mcp/ARCHITECTURE.md) | Complete 340-line architecture doc (in mcp-central-docs) |
 

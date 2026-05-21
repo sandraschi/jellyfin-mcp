@@ -9,24 +9,18 @@
 
 ## Jellyfin Server Setup
 
-### Windows
+**→ Full guide:** [Jellyfin Server Installation Guide](JELLYFIN_SERVER.md) — Windows, Docker, Linux, macOS, NAS, hardware acceleration, media folder structure, remote access, post-install checklist.
+
+Quick reference:
 ```powershell
-# Download from https://jellyfin.org/downloads/windows
-# Run installer — Jellyfin runs as Windows service
-# First-time setup at http://localhost:8096
-```
+# Windows: Download installer from https://jellyfin.org/downloads/windows
 
-### Docker (recommended for dev)
-```bash
-docker run -d --name jellyfin \
-  -p 8096:8096 \
-  -v /path/to/config:/config \
-  -v /path/to/media:/media:ro \
+# Docker (recommended for dev):
+docker run -d --name jellyfin -p 8096:8096 \
+  -v /path/to/config:/config -v /path/to/media:/media:ro \
   jellyfin/jellyfin:latest
-```
 
-### Linux (Debian/Ubuntu)
-```bash
+# Linux (Debian/Ubuntu):
 curl https://repo.jellyfin.org/install-debuntu.sh | sudo bash
 ```
 
