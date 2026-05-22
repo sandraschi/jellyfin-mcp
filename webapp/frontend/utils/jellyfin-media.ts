@@ -1,10 +1,12 @@
+import { API_BASE } from './api';
+
 export function jellyfinImageUrl(
   itemId: string,
   imageType = 'Primary',
   imageIndex = 0,
   options?: { width?: number; height?: number; quality?: number },
 ): string {
-  const base = `/image/Items/${encodeURIComponent(itemId)}/Images/${imageType}/${imageIndex}`;
+  const base = `${API_BASE}/image/Items/${encodeURIComponent(itemId)}/Images/${imageType}/${imageIndex}`;
   if (!options) return base;
   const params = new URLSearchParams();
   if (options.width) params.set('width', String(options.width));

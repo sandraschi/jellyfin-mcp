@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import Field
 
 from ...app import mcp
+from ...services.registry import get_jellyfin_service
 from ...utils import get_logger
 
 logger = get_logger(__name__)
@@ -40,52 +41,67 @@ async def jellyfin_livetv(
     - jellyfin_livetv(operation="delete_recording", recording_id="rec123")
     """
     try:
+        jf = await get_jellyfin_service()
+
         if operation == "channels":
+            data = await jf.get_channels()
+            items = data.get("Items", data if isinstance(data, list) else [])
             return {
                 "success": True,
                 "operation": "channels",
                 "message": "Live TV channels",
-                "data": [],
-                "count": 0,
+                "data": items,
+                "count": len(items),
             }
 
         if operation == "guide":
+            epg = await jf.get_epg(channel_id=channel_id)
+            items = epg.get("Items", epg if isinstance(epg, list) else [])
             return {
                 "success": True,
                 "operation": "guide",
                 "message": "EPG guide data",
-                "data": {"start_time": start_time, "end_time": end_time, "entries": []},
+                "data": {"start_time": start_time, "end_time": end_time, "entries": items},
+                "count": len(items),
             }
 
         if operation == "recordings":
+            data = await jf.get_recordings()
+            items = data.get("Items", data if isinstance(data, list) else [])
             return {
                 "success": True,
                 "operation": "recordings",
                 "message": "DVR recordings list",
-                "data": [],
-                "count": 0,
+                "data": items,
+                "count": len(items),
             }
 
         if operation == "schedule":
             if not program_id:
                 return {"success": False, "error": "program_id is required for schedule", "error_code": "MISSING_PROGRAM_ID"}
+            result = await jf.create_recording(program_id)
             return {
                 "success": True,
                 "operation": "schedule",
                 "message": "Recording scheduled",
-                "data": {"program_id": program_id, "scheduled": True},
+                "data": result,
             }
 
         if operation == "tuners":
+            info = await jf._get("/LiveTv/Info")
+            items = info.get("TunerHosts", info.get("Services", []))
+            if not isinstance(items, list):
+                items = []
             return {
                 "success": True,
                 "operation": "tuners",
                 "message": "Available tuners",
-                "data": [],
-                "count": 0,
+                "data": items,
+                "count": len(items),
             }
 
         if operation == "epg_refresh":
+            await jf._post("/LiveTv/GuideInfo")
             return {
                 "success": True,
                 "operation": "epg_refresh",
@@ -96,6 +112,7 @@ async def jellyfin_livetv(
         if operation == "delete_recording":
             if not recording_id:
                 return {"success": False, "error": "recording_id is required", "error_code": "MISSING_RECORDING_ID"}
+            await jf._delete(f"/LiveTv/Recordings/{recording_id}")
             return {
                 "success": True,
                 "operation": "delete_recording",
@@ -104,11 +121,27 @@ async def jellyfin_livetv(
             }
 
         if operation == "manage":
+            channels = await jf.get_channels()
+            recordings = await jf.get_recordings()
+            channel_items = channels.get("Items", channels if isinstance(channels, list) else [])
+            recording_items = recordings.get("Items", recordings if isinstance(recordings, list) else [])
+            try:
+                info = await jf._get("/LiveTv/Info")
+                tuner_items = info.get("TunerHosts", info.get("Services", []))
+                if not isinstance(tuner_items, list):
+                    tuner_items = []
+            except Exception:
+                tuner_items = []
             return {
                 "success": True,
                 "operation": "manage",
                 "message": "Live TV management overview",
-                "data": {"channels": 0, "tuners": 0, "recordings": 0, "status": "operational"},
+                "data": {
+                    "channels": len(channel_items),
+                    "tuners": len(tuner_items),
+                    "recordings": len(recording_items),
+                    "status": "operational",
+                },
             }
 
         return {

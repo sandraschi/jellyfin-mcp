@@ -6,16 +6,7 @@ from fastmcp.tools import ToolResult
 from pydantic import Field
 
 from ...app import mcp
-
-
-def _get_jellyfin_service():
-    from ...config import get_settings
-    from ...services.jellyfin_service import JellyfinService
-
-    settings = get_settings()
-    if not settings.api_key:
-        raise RuntimeError("JELLYFIN_API_KEY environment variable is required.")
-    return JellyfinService(base_url=settings.server_url, api_key=settings.api_key, timeout=settings.timeout)
+from ...services.registry import get_jellyfin_service
 
 
 @mcp.tool(version="1.0.0", annotations={"readOnlyHint": True})
@@ -44,8 +35,7 @@ async def jellyfin_server(
     jellyfin_server(operation="transcode_queue")
     """
     try:
-        jf = _get_jellyfin_service()
-        await jf.connect()
+        jf = await get_jellyfin_service()
 
         if operation == "status":
             data = await jf.get_server_status()
@@ -62,7 +52,8 @@ async def jellyfin_server(
                 "startup_wizard_completed": info.get("StartupWizardCompleted"),
             }
         elif operation == "logs":
-            data = await jf._get("/System/Logs/Log", limit=lines)
+            # Returns list of available log files; Jellyfin serves individual logs by filename
+            data = await jf._get("/System/Logs")
         elif operation == "restart":
             data = await jf._post("/System/Restart", json_body={})
         elif operation == "shutdown":
@@ -76,7 +67,18 @@ async def jellyfin_server(
                 raise ValueError("task_id is required for 'task_run' operation.")
             data = await jf.run_task(task_id)
         elif operation == "transcode_queue":
-            data = await jf._get("/System/Transcoding")
+            # Active transcodes appear as sessions with TranscodingInfo populated
+            sessions = await jf.get_sessions()
+            data = [
+                {
+                    "session_id": s.get("Id"),
+                    "user": s.get("UserName", ""),
+                    "item": s.get("NowPlayingItem", {}).get("Name", ""),
+                    "transcode_info": s.get("TranscodingInfo"),
+                }
+                for s in (sessions if isinstance(sessions, list) else [])
+                if s.get("TranscodingInfo")
+            ]
         else:
             raise ValueError(f"Unknown operation: {operation}")
 

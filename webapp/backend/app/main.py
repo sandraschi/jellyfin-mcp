@@ -33,6 +33,13 @@ _current_file = Path(__file__).resolve()
 project_root = _current_file.parent.parent.parent.parent
 src_path = project_root / "src"
 
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(project_root / ".env")
+except ImportError:
+    pass
+
 if src_path.exists():
     src_str = str(src_path)
     if src_str not in sys.path:

@@ -12,6 +12,7 @@ class CreateUserRequest(BaseModel):
     password: str | None = None
 
 
+@router.get("")
 @router.get("/")
 async def list_users():
     """List all Jellyfin users."""

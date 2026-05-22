@@ -6,6 +6,7 @@ from pydantic import Field
 
 from ...app import mcp
 from ...services.rag_service import RAGService
+from ...services.registry import get_jellyfin_service
 from ...utils import get_logger
 
 logger = get_logger(__name__)
@@ -41,11 +42,27 @@ async def jellyfin_rag(
         rag = RAGService()
 
         if operation == "sync":
-            result = await rag.sync_metadata(items=[])
+            jf = await get_jellyfin_service()
+            # Fetch all items across all libraries (up to 5000)
+            raw = await jf.get_items(limit=5000, recursive=True)
+            items = raw.get("Items", raw) if isinstance(raw, dict) else raw
+            # Normalise field names to lowercase for RAGService
+            normalised = [
+                {
+                    "id": i.get("Id", ""),
+                    "name": i.get("Name", ""),
+                    "overview": i.get("Overview", ""),
+                    "genres": i.get("Genres", []),
+                    "type": i.get("Type", ""),
+                    "production_year": i.get("ProductionYear"),
+                }
+                for i in (items if isinstance(items, list) else [])
+            ]
+            result = await rag.sync_metadata(items=normalised)
             return {
                 "success": True,
                 "operation": "sync",
-                "message": f"RAG sync complete — {result.get('indexed', 0)} items indexed",
+                "message": f"RAG sync complete — {result.get('indexed', 0)} of {result.get('total', 0)} items indexed",
                 "data": result,
             }
 
@@ -81,11 +98,12 @@ async def jellyfin_rag(
             }
 
         if operation == "purge":
+            result = await rag.purge()
             return {
                 "success": True,
                 "operation": "purge",
                 "message": "RAG index cleared — run sync to re-index",
-                "data": {"purged": True},
+                "data": result,
             }
 
         return {
@@ -95,6 +113,13 @@ async def jellyfin_rag(
             "suggestions": ["Valid operations: sync, search, status, reindex, purge"],
         }
 
+    except ImportError as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "error_code": "MISSING_DEPENDENCIES",
+            "operation": operation,
+        }
     except Exception as e:
         logger.exception("Error in jellyfin_rag operation '%s':", operation)
         return {"success": False, "error": str(e), "error_code": "EXECUTION_ERROR", "operation": operation}

@@ -6,16 +6,7 @@ from fastmcp.tools import ToolResult
 from pydantic import Field
 
 from ...app import mcp
-
-
-def _get_jellyfin_service():
-    from ...config import get_settings
-    from ...services.jellyfin_service import JellyfinService
-
-    settings = get_settings()
-    if not settings.api_key:
-        raise RuntimeError("JELLYFIN_API_KEY environment variable is required.")
-    return JellyfinService(base_url=settings.server_url, api_key=settings.api_key, timeout=settings.timeout)
+from ...services.registry import get_jellyfin_service
 
 
 @mcp.tool(version="1.0.0", annotations={"readOnlyHint": False, "destructiveHint": False})
@@ -40,11 +31,11 @@ async def jellyfin_collections(
     jellyfin_collections(operation="add_items", collection_id="col123", item_ids=["3"])
     """
     try:
-        jf = _get_jellyfin_service()
-        await jf.connect()
+        jf = await get_jellyfin_service()
 
         if operation == "list":
-            data = await jf.get_collections(user_id or "")
+            uid = user_id or await jf.get_default_user_id()
+            data = await jf.get_collections(uid)
         elif operation == "get":
             if not collection_id:
                 raise ValueError("collection_id is required for 'get' operation.")

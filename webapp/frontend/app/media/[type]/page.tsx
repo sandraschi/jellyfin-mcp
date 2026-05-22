@@ -1,14 +1,16 @@
-import { Suspense } from 'react';
 import { MediaGrid } from './media-grid';
-import { MediaSkeleton } from './media-skeleton';
 
-export const dynamic = 'force-dynamic';
+const MEDIA_TYPES = ['Movies', 'Series', 'Music', 'Photos', 'Books'];
 
-export default async function MediaPage({ params }: { params: Promise<{ type: string }> }) {
+export function generateStaticParams() {
+  return MEDIA_TYPES.map((type) => ({ type }));
+}
+
+export default async function MediaPage({
+  params,
+}: {
+  params: Promise<{ type: string }>;
+}) {
   const { type } = await params;
-  return (
-    <Suspense fallback={<MediaSkeleton />}>
-      <MediaGrid mediaType={type} />
-    </Suspense>
-  );
+  return <MediaGrid mediaType={type} />;
 }

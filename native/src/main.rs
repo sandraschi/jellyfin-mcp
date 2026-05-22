@@ -17,9 +17,32 @@ async fn start_backend(
         .map_err(|e| format!("Sidecar error: {}", e))?
         .args(["--http", "--port", "10934"]);
 
-    let (_, child) = cmd.spawn().map_err(|e| format!("Failed: {}", e))?;
+    let (mut rx, child) = cmd
+        .spawn()
+        .map_err(|e| format!("Failed to start backend: {}", e))?;
     *state.0.lock().unwrap() = Some(child);
-    Ok("Backend starting".into())
+
+    tauri::async_runtime::spawn(async move {
+        use tauri_plugin_shell::process::CommandEvent;
+        while let Some(event) = rx.recv().await {
+            match event {
+                CommandEvent::Stdout(line) | CommandEvent::Stderr(line) => {
+                    let text = String::from_utf8_lossy(&line);
+                    eprintln!("[backend] {}", text.trim());
+                    if text.contains("Uvicorn running")
+                        || text.contains("Application startup complete")
+                        || text.contains("Starting jellyfin-mcp")
+                    {
+                        let _ = app.emit("backend-status", "ready");
+                        break;
+                    }
+                }
+                _ => {}
+            }
+        }
+    });
+
+    Ok("Backend starting on port 10934".into())
 }
 
 fn main() {
@@ -40,7 +63,6 @@ fn main() {
                     }
                 }
             });
-
             #[cfg(debug_assertions)]
             if let Some(window) = app.get_webview_window("main") {
                 window.open_devtools();

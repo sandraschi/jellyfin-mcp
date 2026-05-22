@@ -6,6 +6,7 @@ from ..jel import get_client
 router = APIRouter()
 
 
+@router.get("")
 @router.get("/")
 async def list_plugins():
     """List installed Jellyfin plugins."""
@@ -20,16 +21,14 @@ async def list_plugins():
 
 @router.get("/catalog")
 async def plugin_catalog():
-    """Fetch remote plugin catalog from official Jellyfin manifest."""
-    import httpx
-
+    """Fetch plugin catalog from the Jellyfin server."""
     try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.get(
-                "https://raw.githubusercontent.com/jellyfin/jellyfin-plugin-manifest/master/manifest.json"
-            )
+        async with get_client() as client:
+            resp = await client.get("/Packages")
             resp.raise_for_status()
-            return {"success": True, "data": resp.json()}
+            data = resp.json()
+            packages = data if isinstance(data, list) else data.get("Items", data)
+            return {"success": True, "data": packages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

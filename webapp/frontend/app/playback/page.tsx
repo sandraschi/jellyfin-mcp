@@ -16,7 +16,7 @@ import {
   Cpu,
   Zap,
 } from 'lucide-react';
-import { fetchSessions, sendPlaybackCommand } from '@/utils/api';
+import { fetchSessions, sendPlaybackCommand, API_BASE } from '@/utils/api';
 
 interface PlaybackSession {
   Id: string;
@@ -63,8 +63,13 @@ export default function PlaybackPage() {
 
     let ws: WebSocket;
     try {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+      const wsBase =
+        API_BASE ||
+        (window.location.protocol === 'https:' ? 'https:' : 'http:') +
+          '//' +
+          window.location.host;
+      const wsUrl = `${wsBase.replace(/^http/, 'ws')}/ws`;
+      ws = new WebSocket(wsUrl);
 
       ws.onopen = () => setWsConnected(true);
       ws.onclose = () => setWsConnected(false);

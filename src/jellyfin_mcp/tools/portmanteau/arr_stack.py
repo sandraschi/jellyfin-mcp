@@ -76,7 +76,7 @@ async def jellyfin_arr_stack(
             for svc in ["radarr", "sonarr", "lidarr"]:
                 data = await _query_arr_api(svc, "system/status")
                 if data is None:
-                    results[svc] = {"configured": False, "message": "Not configured. Set {ARR_SERVICES[svc]['env_url']} env var."}
+                    results[svc] = {"configured": False, "message": f"Not configured. Set {ARR_SERVICES[svc]['env_url']} env var."}
                 elif "_error" in data:
                     results[svc] = {"configured": True, "reachable": False, "error": data["_error"], "url": data["_url"]}
                 else:

@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import {
   Activity,
   Server,
@@ -11,24 +14,65 @@ import {
   ScanLine,
   Database,
 } from 'lucide-react';
-import { fetchSystemInfo, fetchLibraries, fetchRecentActivity, fetchSessions } from '@/utils/api';
+import {
+  fetchSystemInfo,
+  fetchLibraries,
+  fetchRecentActivity,
+  fetchSessions,
+  runScan,
+  refreshMetadata,
+} from '@/utils/api';
 
-export async function OverviewDashboard() {
-  let systemInfo = null;
-  let libraries: unknown[] = [];
-  let activity: unknown[] = [];
-  let sessions: unknown[] = [];
-  let error: string | null = null;
+export function OverviewDashboard() {
+  const [systemInfo, setSystemInfo] = useState<any>(null);
+  const [libraries, setLibraries] = useState<unknown[]>([]);
+  const [activity, setActivity] = useState<unknown[]>([]);
+  const [sessions, setSessions] = useState<unknown[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [actionPending, setActionPending] = useState(false);
 
-  try {
-    [systemInfo, libraries, activity, sessions] = await Promise.all([
-      fetchSystemInfo().catch(() => null),
-      fetchLibraries().catch(() => []),
-      fetchRecentActivity().catch(() => []),
-      fetchSessions().catch(() => []),
-    ]);
-  } catch {
-    error = 'Failed to load dashboard data';
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [info, libs, act, sess] = await Promise.all([
+          fetchSystemInfo().catch(() => null),
+          fetchLibraries().catch(() => []),
+          fetchRecentActivity().catch(() => []),
+          fetchSessions().catch(() => []),
+        ]);
+        if (!cancelled) {
+          setSystemInfo(info);
+          setLibraries(libs);
+          setActivity(act);
+          setSessions(sess);
+          setError(null);
+        }
+      } catch {
+        if (!cancelled) setError('Failed to load dashboard data');
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleScan() {
+    setActionPending(true);
+    try {
+      await runScan();
+    } finally {
+      setActionPending(false);
+    }
+  }
+
+  async function handleRefresh() {
+    setActionPending(true);
+    try {
+      await refreshMetadata();
+    } finally {
+      setActionPending(false);
+    }
   }
 
   return (
@@ -39,10 +83,17 @@ export async function OverviewDashboard() {
           <p className="mt-1 text-sm text-[#777790]">jellyfin-mcp server dashboard</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
-            <span className="h-2 w-2 rounded-full bg-green-400" />
-            Connected
-          </span>
+          {systemInfo ? (
+            <span className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3 py-1 text-xs font-medium text-green-400">
+              <span className="h-2 w-2 rounded-full bg-green-400" />
+              Connected
+            </span>
+          ) : (
+            <span className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3 py-1 text-xs font-medium text-red-400">
+              <span className="h-2 w-2 rounded-full bg-red-400" />
+              Disconnected
+            </span>
+          )}
         </div>
       </div>
 
@@ -126,24 +177,24 @@ export async function OverviewDashboard() {
       </div>
 
       <div className="flex items-center gap-3">
-        <form action={async () => { 'use server'; await fetch('http://127.0.0.1:10934/api/libraries/scan', { method: 'POST' }); }}>
-          <button
-            type="submit"
-            className="btn-secondary inline-flex items-center gap-2 text-sm"
-          >
-            <ScanLine className="h-4 w-4" />
-            Scan All Libraries
-          </button>
-        </form>
-        <form action={async () => { 'use server'; await fetch('http://127.0.0.1:10934/api/libraries/refresh-metadata', { method: 'POST' }); }}>
-          <button
-            type="submit"
-            className="btn-secondary inline-flex items-center gap-2 text-sm"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Refresh Metadata
-          </button>
-        </form>
+        <button
+          type="button"
+          disabled={actionPending}
+          onClick={handleScan}
+          className="btn-secondary inline-flex items-center gap-2 text-sm"
+        >
+          <ScanLine className="h-4 w-4" />
+          Scan All Libraries
+        </button>
+        <button
+          type="button"
+          disabled={actionPending}
+          onClick={handleRefresh}
+          className="btn-secondary inline-flex items-center gap-2 text-sm"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh Metadata
+        </button>
       </div>
     </div>
   );

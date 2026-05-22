@@ -30,6 +30,16 @@ interface CatalogPlugin {
   Category: string;
 }
 
+function normalizeCatalogItem(raw: Record<string, unknown>): CatalogPlugin {
+  return {
+    Id: String(raw.Id ?? raw.id ?? raw.Guid ?? ''),
+    Name: String(raw.Name ?? raw.name ?? 'Unknown plugin'),
+    Version: String(raw.Version ?? raw.version ?? '?'),
+    Description: String(raw.Description ?? raw.description ?? ''),
+    Category: String(raw.Category ?? raw.category ?? ''),
+  };
+}
+
 export default function PluginsPage() {
   const [installed, setInstalled] = useState<InstalledPlugin[]>([]);
   const [catalog, setCatalog] = useState<CatalogPlugin[]>([]);
@@ -47,7 +57,7 @@ export default function PluginsPage() {
         fetchPluginCatalog(),
       ]);
       setInstalled(inst as InstalledPlugin[]);
-      setCatalog(cat as CatalogPlugin[]);
+      setCatalog((cat as unknown as Record<string, unknown>[]).map(normalizeCatalogItem));
       setError(null);
     } catch (err: any) {
       setError(err.message || 'Failed to load plugins');
@@ -85,8 +95,10 @@ export default function PluginsPage() {
 
   const categories = [...new Set(catalog.map((p) => p.Category).filter(Boolean))];
   const filteredCatalog = catalog.filter((p) => {
-    const matchesSearch = p.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.Description.toLowerCase().includes(searchTerm.toLowerCase());
+    const name = (p.Name ?? '').toLowerCase();
+    const description = (p.Description ?? '').toLowerCase();
+    const term = searchTerm.toLowerCase();
+    const matchesSearch = name.includes(term) || description.includes(term);
     const matchesCategory = !categoryFilter || p.Category === categoryFilter;
     return matchesSearch && matchesCategory;
   });

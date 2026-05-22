@@ -95,7 +95,7 @@ just webapp
 - **Webapp Backend**: FastAPI, uvicorn, Starlette
 - **Webapp Frontend**: Next.js 15.2, React 18, Tailwind CSS 3, Lucide icons, Recharts
 - **RAG**: LanceDB + sentence-transformers (all-MiniLM-L6-v2)
-- **Native**: Tauri 2.0 (Rust), PyInstaller sidecar
+- **Native**: Tauri 2.0 (Rust), PyInstaller sidecar — `just tauri-build`, `just tauri-dev`, `just tauri-sidecar`
 - **Quality**: Ruff, Biome, Playwright, pytest
 
 ## Project Status

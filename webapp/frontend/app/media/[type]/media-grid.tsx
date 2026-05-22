@@ -1,3 +1,6 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { fetchMedia } from '@/utils/api';
 import { jellyfinImageUrl, formatRuntime } from '@/utils/jellyfin-media';
@@ -7,18 +10,20 @@ const mediaTypes = ['Movies', 'Series', 'Music', 'Photos', 'Books'];
 
 interface Props {
   mediaType: string;
-  searchParams?: { sort?: string; library?: string };
 }
 
-export async function MediaGrid({ mediaType }: Props) {
-  let data: { Items: any[]; TotalRecordCount: number } = { Items: [], TotalRecordCount: 0 };
-  let error: string | null = null;
+export function MediaGrid({ mediaType }: Props) {
+  const [data, setData] = useState<{ Items: any[]; TotalRecordCount: number }>({
+    Items: [],
+    TotalRecordCount: 0,
+  });
+  const [error, setError] = useState<string | null>(null);
 
-  try {
-    data = await fetchMedia(mediaType);
-  } catch {
-    error = `Failed to load ${mediaType}`;
-  }
+  useEffect(() => {
+    fetchMedia(mediaType)
+      .then(setData)
+      .catch(() => setError(`Failed to load ${mediaType}`));
+  }, [mediaType]);
 
   return (
     <div className="space-y-8">

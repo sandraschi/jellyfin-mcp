@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import Field
 
 from ...app import mcp
+from ...services.registry import get_jellyfin_service
 from ...utils import get_logger
 
 logger = get_logger(__name__)
@@ -43,59 +44,84 @@ async def jellyfin_recommend(
         if operation == "similar":
             if not item_id:
                 return {"success": False, "error": "item_id is required for similar recommendations", "error_code": "MISSING_ITEM_ID"}
+            jf = await get_jellyfin_service()
+            raw = await jf.get_similar(item_id, limit=limit or 10)
+            items = raw.get("Items", raw) if isinstance(raw, dict) else raw
             return {
                 "success": True,
                 "operation": "similar",
-                "message": "Similar items recommendations",
-                "data": [],
-                "count": 0,
+                "message": f"Found {len(items)} similar items",
+                "data": items,
+                "count": len(items),
                 "item_id": item_id,
             }
 
         if operation == "genre":
             if not genre:
                 return {"success": False, "error": "genre is required for genre recommendations", "error_code": "MISSING_GENRE"}
+            jf = await get_jellyfin_service()
+            # Pass genre as server-side filter; Jellyfin accepts Genres as a comma-separated param
+            raw = await jf.get_items(limit=limit or 10, recursive=True, genres=genre)
+            items = raw.get("Items", []) if isinstance(raw, dict) else []
             return {
                 "success": True,
                 "operation": "genre",
-                "message": f"Recommendations in genre '{genre}'",
-                "data": [],
-                "count": 0,
+                "message": f"{len(items)} recommendations in genre '{genre}'",
+                "data": items,
+                "count": len(items),
                 "genre": genre,
             }
 
         if operation == "director":
             if not director:
                 return {"success": False, "error": "director is required", "error_code": "MISSING_DIRECTOR"}
+            jf = await get_jellyfin_service()
+            raw = await jf.search(query=director, include_item_types="Movie,Series", limit=limit or 10)
+            items = raw.get("SearchHints", raw.get("Items", [])) if isinstance(raw, dict) else []
             return {
                 "success": True,
                 "operation": "director",
-                "message": f"Recommendations by director '{director}'",
-                "data": [],
-                "count": 0,
+                "message": f"{len(items)} recommendations by director '{director}'",
+                "data": items,
+                "count": len(items),
                 "director": director,
             }
 
         if operation == "actor":
             if not actor:
                 return {"success": False, "error": "actor is required", "error_code": "MISSING_ACTOR"}
+            jf = await get_jellyfin_service()
+            raw = await jf.search(query=actor, include_item_types="Movie,Series", limit=limit or 10)
+            items = raw.get("SearchHints", raw.get("Items", [])) if isinstance(raw, dict) else []
             return {
                 "success": True,
                 "operation": "actor",
-                "message": f"Recommendations featuring '{actor}'",
-                "data": [],
-                "count": 0,
+                "message": f"{len(items)} recommendations featuring '{actor}'",
+                "data": items,
+                "count": len(items),
                 "actor": actor,
             }
 
         if operation == "history":
+            jf = await get_jellyfin_service()
+            uid = user_id or await jf.get_default_user_id()
+            # Use played-items endpoint for actual watch history, not live sessions
+            raw = await jf._get(
+                f"/Users/{uid}/Items",
+                SortBy="DatePlayed",
+                SortOrder="Descending",
+                Filters="IsPlayed",
+                Limit=limit or 10,
+                Recursive="true",
+            )
+            items = raw.get("Items", []) if isinstance(raw, dict) else []
             return {
                 "success": True,
                 "operation": "history",
-                "message": "Watch-history-based recommendations",
-                "data": [],
-                "count": 0,
-                "user_id": user_id,
+                "message": f"{len(items)} recently played items for user",
+                "data": items,
+                "count": len(items),
+                "user_id": uid,
             }
 
         return {

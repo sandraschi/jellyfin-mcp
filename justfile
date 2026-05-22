@@ -38,10 +38,36 @@ fmt:
     cd webapp/frontend && npx @biomejs/biome format --write .
 
 test:
-    @pytest --cov=src/jellyfin_mcp tests/ -v
+    @pytest tests/ -v -m "not slow"
+
+test-all:
+    @pytest tests/ -v
+
+test-unit:
+    @pytest tests/unit -v
+
+test-integration:
+    @pytest tests/integration -v -m "integration and not slow"
+
+test-slow:
+    @pytest tests/integration/test_rag.py -v -m slow
 
 e2e:
-    cd webapp/frontend && npx playwright test
+    Set-Location webapp/frontend
+    npx playwright install chromium
+    npx playwright test
+
+e2e-ui:
+    Set-Location webapp/frontend
+    npx playwright test --ui
+
+e2e-headed:
+    Set-Location webapp/frontend
+    npx playwright test --headed
+
+e2e-serve:
+    Set-Location webapp/frontend
+    npx playwright test -g "@noop"
 
 ci: lint test
 
@@ -60,6 +86,20 @@ build-native-debug:
     Set-Location '{{justfile_directory()}}\native'
     $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
     npx @tauri-apps/cli build --debug
+
+tauri-sidecar:
+    pwsh -NoLogo -File '{{justfile_directory()}}\native\build-sidecar.ps1'
+
+tauri-build:
+    Set-Location '{{justfile_directory()}}\native'
+    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+    .\build.ps1
+
+tauri-dev:
+    Set-Location '{{justfile_directory()}}\native'
+    $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
+    npm install
+    npx @tauri-apps/cli dev
 
 clean:
     @powershell -Command "Remove-Item -Recurse -Force .pytest_cache, .ruff_cache, dist, build, htmlcov -ErrorAction SilentlyContinue"

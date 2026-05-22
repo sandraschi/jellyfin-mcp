@@ -1,4 +1,4 @@
-"""Jellyfin REST API service wrapper using jellyfin-apiclient-python."""
+"""Jellyfin REST API service wrapper using httpx."""
 
 from typing import Any
 
@@ -16,6 +16,7 @@ class JellyfinService(BaseService):
         self.api_key = api_key
         self.timeout = timeout
         self._http: httpx.AsyncClient | None = None
+        self._default_user_id: str | None = None
 
     async def _initialize(self, **kwargs) -> None:
         self._http = httpx.AsyncClient(
@@ -128,6 +129,8 @@ class JellyfinService(BaseService):
         recursive: bool = True,
         filters: str | None = None,
         search_term: str | None = None,
+        genres: str | None = None,
+        fields: str | None = None,
     ) -> dict:
         params: dict[str, Any] = {
             "SortBy": sort_by,
@@ -143,13 +146,30 @@ class JellyfinService(BaseService):
             params["Filters"] = filters
         if search_term:
             params["SearchTerm"] = search_term
+        if genres:
+            params["Genres"] = genres
+        if fields:
+            params["Fields"] = fields
         return await self._get("/Items", **params)
 
+    async def get_default_user_id(self) -> str:
+        """Resolve a default user ID for user-scoped API paths."""
+        if self._default_user_id:
+            return self._default_user_id
+
+        users = await self.get_users()
+        if not users:
+            raise NotFoundError("No Jellyfin users found")
+        self._default_user_id = users[0]["Id"]
+        return self._default_user_id
+
     async def get_item(self, item_id: str) -> dict:
-        return await self._get(f"/Users/{{user_id}}/Items/{item_id}")
+        user_id = await self.get_default_user_id()
+        return await self._get(f"/Users/{user_id}/Items/{item_id}")
 
     async def get_recent(self, library_id: str, limit: int = 24) -> dict:
-        return await self._get("/Users/{user_id}/Items/Latest", ParentId=library_id, Limit=limit)
+        user_id = await self.get_default_user_id()
+        return await self._get(f"/Users/{user_id}/Items/Latest", ParentId=library_id, Limit=limit)
 
     async def get_similar(self, item_id: str, limit: int = 10) -> dict:
         return await self._get(f"/Items/{item_id}/Similar", Limit=limit)
@@ -256,11 +276,9 @@ class JellyfinService(BaseService):
     async def get_plugins(self) -> list[dict]:
         return await self._get("/Plugins")
 
-    async def get_plugin_manifest(self) -> dict:
-        """Fetch remote plugin catalog."""
-        async with httpx.AsyncClient(timeout=self.timeout) as client:
-            resp = await client.get("https://raw.githubusercontent.com/jellyfin/jellyfin-plugin-manifest/master/manifest.json")
-            return resp.json()
+    async def get_plugin_manifest(self) -> dict | list:
+        """Fetch plugin catalog from the Jellyfin server."""
+        return await self._get("/Packages")
 
     async def install_plugin(self, plugin_id: str, version: str = "latest") -> dict:
         return await self._post(f"/Plugins/{plugin_id}/Install", json_body={"Version": version})

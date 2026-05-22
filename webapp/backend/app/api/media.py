@@ -5,6 +5,14 @@ from ..jel import get_client
 
 router = APIRouter()
 
+MEDIA_TYPE_MAP = {
+    "Movies": "Movie",
+    "Series": "Series",
+    "Music": "MusicAlbum",
+    "Photos": "Photo",
+    "Books": "Book",
+}
+
 
 @router.get("/browse")
 async def browse_items(
@@ -69,12 +77,37 @@ async def get_similar(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{item_id}")
-async def get_item(item_id: str):
-    """Get full metadata for an item."""
+@router.get("/{path_id}")
+async def browse_or_get_item(
+    path_id: str,
+    limit: int = Query(100, ge=1, le=500),
+    sort_by: str = Query("SortName"),
+    sort_order: str = Query("Ascending"),
+):
+    """Browse by media type label (Movies, Series, ...) or fetch a single item by ID."""
+    if path_id in MEDIA_TYPE_MAP:
+        try:
+            params = {
+                "IncludeItemTypes": MEDIA_TYPE_MAP[path_id],
+                "SortBy": sort_by,
+                "SortOrder": sort_order,
+                "Limit": limit,
+                "Recursive": "true",
+            }
+            async with get_client() as client:
+                resp = await client.get("/Items", params=params)
+                resp.raise_for_status()
+                return {"success": True, "data": resp.json()}
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
     try:
         async with get_client() as client:
-            resp = await client.get(f"/Users/{{user_id}}/Items/{item_id}")
+            users_resp = await client.get("/Users")
+            users_resp.raise_for_status()
+            users = users_resp.json()
+            user_id = users[0]["Id"] if users else ""
+            resp = await client.get(f"/Users/{user_id}/Items/{path_id}")
             resp.raise_for_status()
             return {"success": True, "data": resp.json()}
     except Exception as e:

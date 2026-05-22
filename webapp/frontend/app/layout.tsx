@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="bg-jellyfin-darker text-white antialiased">
+      <body className="bg-jellyfin-darker text-white antialiased" suppressHydrationWarning>
         <AppLayout>{children}</AppLayout>
       </body>
     </html>

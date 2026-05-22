@@ -1,5 +1,8 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import { fetchLibraries } from '@/utils/api';
-import { libraryTypeIcon, libraryTypeColor } from '@/utils/jellyfin-media';
+import { libraryTypeColor } from '@/utils/jellyfin-media';
 import {
   Film,
   Tv,
@@ -8,21 +11,19 @@ import {
   BookOpen,
   Video,
   FolderOpen,
-  ScanLine,
-  RefreshCw,
   CheckCircle,
   Clock,
 } from 'lucide-react';
 
-export async function LibraryList() {
-  let libraries: any[] = [];
-  let error: string | null = null;
+export function LibraryList() {
+  const [libraries, setLibraries] = useState<any[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  try {
-    libraries = await fetchLibraries();
-  } catch {
-    error = 'Failed to load libraries';
-  }
+  useEffect(() => {
+    fetchLibraries()
+      .then(setLibraries)
+      .catch(() => setError('Failed to load libraries'));
+  }, []);
 
   const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
     Movies: Film,

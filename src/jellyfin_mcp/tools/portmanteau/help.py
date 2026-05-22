@@ -37,15 +37,18 @@ async def jellyfin_help(
     """
     try:
         _tools_catalog = {
-            "jellyfin_library": {"operations": ["list", "get", "create", "update", "delete", "scan", "refresh"], "category": "library"},
-            "jellyfin_media": {"operations": ["browse", "details", "update", "delete", "refresh"], "category": "media"},
-            "jellyfin_search": {"operations": ["search", "suggest", "advanced"], "category": "search"},
-            "jellyfin_playback": {"operations": ["list_sessions", "play", "pause", "stop", "seek"], "category": "playback"},
-            "jellyfin_user": {"operations": ["list", "get", "create", "update", "delete", "policy"], "category": "user"},
-            "jellyfin_playlist": {"operations": ["list", "get", "create", "update", "delete", "add_items", "remove_items"], "category": "playlist"},
-            "jellyfin_server": {"operations": ["status", "info", "restart", "logs", "update"], "category": "server"},
-            "jellyfin_streaming": {"operations": ["sessions", "clients", "transcoding"], "category": "streaming"},
-            "jellyfin_plugin": {"operations": ["catalog", "install", "uninstall", "configure", "status"], "category": "plugin"},
+            "jellyfin_library": {"operations": ["list", "get", "create", "update", "delete", "scan", "refresh", "stats", "cleanup", "add_path", "remove_path", "optimize", "empty_trash", "reorder", "configure"], "category": "library"},
+            "jellyfin_media": {"operations": ["browse", "search", "get", "get_recent", "get_recommended", "similar", "stream_info", "refresh", "update", "delete"], "category": "media"},
+            "jellyfin_search": {"operations": ["search", "advanced", "people", "studios", "suggest", "saved"], "category": "search"},
+            "jellyfin_playback": {"operations": ["list_sessions", "play", "pause", "stop", "resume", "seek", "skip_next", "skip_prev", "set_volume", "set_subtitle", "set_audio", "set_quality"], "category": "playback"},
+            "jellyfin_user": {"operations": ["list", "get", "create", "update", "delete", "policy", "password", "sessions", "activity", "devices"], "category": "user"},
+            "jellyfin_playlist": {"operations": ["list", "get", "create", "update", "delete", "add_items", "remove_items", "reorder", "share"], "category": "playlist"},
+            "jellyfin_collections": {"operations": ["list", "get", "create", "update", "delete", "add_items", "remove_items"], "category": "collections"},
+            "jellyfin_metadata": {"operations": ["get", "update", "refresh", "identify", "images", "backdrops", "providers", "lock", "unlock", "fetch"], "category": "metadata"},
+            "jellyfin_server": {"operations": ["status", "info", "health", "logs", "restart", "shutdown", "updates", "tasks", "task_run", "transcode_queue"], "category": "server"},
+            "jellyfin_streaming": {"operations": ["sessions", "clients", "transcode", "bandwidth", "direct_play", "remote", "lan", "kill"], "category": "streaming"},
+            "jellyfin_plugin": {"operations": ["catalog", "list", "install", "uninstall", "enable", "disable", "configure", "update"], "category": "plugin"},
+            "jellyfin_arr_stack": {"operations": ["status", "queue", "history", "radarr", "sonarr", "lidarr"], "category": "integration"},
             "jellyfin_subtitle": {"operations": ["search", "download", "upload", "delete", "sync", "offset", "provider_config"], "category": "subtitle"},
             "jellyfin_livetv": {"operations": ["channels", "guide", "recordings", "schedule", "tuners", "epg_refresh", "delete_recording", "manage"], "category": "livetv"},
             "jellyfin_ffmpeg": {"operations": ["profiles", "performance", "detect_hw", "path", "test", "benchmarks"], "category": "transcoding"},
@@ -54,6 +57,7 @@ async def jellyfin_help(
             "jellyfin_reporting": {"operations": ["stats", "popular", "recent", "genres", "resolution", "codec", "user_activity", "export"], "category": "reporting"},
             "jellyfin_recommend": {"operations": ["similar", "genre", "director", "actor", "history"], "category": "recommendation"},
             "jellyfin_integration": {"operations": ["export_plex", "import_plex", "sync_watchstate", "backup", "restore"], "category": "integration"},
+            "jellyfin_agentic": {"operations": ["workflow", "natural_query", "batch"], "category": "agentic"},
         }
 
         if operation == "discover":

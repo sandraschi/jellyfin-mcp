@@ -6,16 +6,7 @@ from fastmcp.tools import ToolResult
 from pydantic import Field
 
 from ...app import mcp
-
-
-def _get_jellyfin_service():
-    from ...config import get_settings
-    from ...services.jellyfin_service import JellyfinService
-
-    settings = get_settings()
-    if not settings.api_key:
-        raise RuntimeError("JELLYFIN_API_KEY environment variable is required.")
-    return JellyfinService(base_url=settings.server_url, api_key=settings.api_key, timeout=settings.timeout)
+from ...services.registry import get_jellyfin_service
 
 
 @mcp.tool(version="1.0.0", annotations={"readOnlyHint": False, "destructiveHint": True})
@@ -51,8 +42,7 @@ async def jellyfin_metadata(
     jellyfin_metadata(operation="fetch", item_id="abc123", provider_id="Tvdb", search_name="The Show", year=2024)
     """
     try:
-        jf = _get_jellyfin_service()
-        await jf.connect()
+        jf = await get_jellyfin_service()
 
         if operation == "get":
             if not item_id:
@@ -93,15 +83,21 @@ async def jellyfin_metadata(
         elif operation == "providers":
             if not item_id:
                 raise ValueError("item_id is required for 'providers' operation.")
-            data = await jf._get(f"/Items/{item_id}/RemoteSearch")
+            # Returns external ID provider info for the item
+            data = await jf._get(f"/Items/{item_id}/ExternalIdInfos")
         elif operation == "lock":
             if not item_id:
                 raise ValueError("item_id is required for 'lock' operation.")
-            data = await jf._post(f"/Items/{item_id}/Lock", json_body={})
+            # Lock metadata by setting LockData=True on the item
+            current = await jf._get(f"/Items/{item_id}")
+            current["LockData"] = True
+            data = await jf.update_item(item_id=item_id, metadata=current)
         elif operation == "unlock":
             if not item_id:
                 raise ValueError("item_id is required for 'unlock' operation.")
-            data = await jf._post(f"/Items/{item_id}/Unlock", json_body={})
+            current = await jf._get(f"/Items/{item_id}")
+            current["LockData"] = False
+            data = await jf.update_item(item_id=item_id, metadata=current)
         elif operation == "fetch":
             if not item_id:
                 raise ValueError("item_id is required for 'fetch' operation.")

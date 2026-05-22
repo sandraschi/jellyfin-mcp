@@ -6,16 +6,7 @@ from fastmcp.tools import ToolResult
 from pydantic import Field
 
 from ...app import mcp
-
-
-def _get_jellyfin_service():
-    from ...config import get_settings
-    from ...services.jellyfin_service import JellyfinService
-
-    settings = get_settings()
-    if not settings.api_key:
-        raise RuntimeError("JELLYFIN_API_KEY environment variable is required.")
-    return JellyfinService(base_url=settings.server_url, api_key=settings.api_key, timeout=settings.timeout)
+from ...services.registry import get_jellyfin_service
 
 
 @mcp.tool(version="1.0.0", annotations={"readOnlyHint": True})
@@ -38,6 +29,7 @@ async def jellyfin_media(
     sort_order: Annotated[Literal["Ascending", "Descending"], Field(description="Sort direction.")] = "Ascending",
     limit: Annotated[int, Field(description="Max items to return.", ge=1, le=500)] = 50,
     filters: Annotated[str | None, Field(description="Comma-separated Jellyfin filters (e.g. 'IsUnplayed,IsFavorite').")] = None,
+    metadata: Annotated[dict | None, Field(description="Metadata fields to update (for 'update' operation). Merged with the current item before posting.")] = None,
 ) -> ToolResult:
     """Browse and manage Jellyfin media items: browse library, search, get details, similar, stream info, CRUD.
 
@@ -51,8 +43,7 @@ async def jellyfin_media(
     jellyfin_media(operation="similar", item_id="def456")
     """
     try:
-        jf = _get_jellyfin_service()
-        await jf.connect()
+        jf = await get_jellyfin_service()
 
         if operation == "browse":
             kwargs = {
@@ -107,7 +98,11 @@ async def jellyfin_media(
         elif operation == "update":
             if not item_id:
                 raise ValueError("item_id is required for 'update' operation.")
-            data = {"message": "Provide metadata as a dict in a follow-up call for full update.", "item_id": item_id}
+            if not metadata:
+                raise ValueError("metadata is required for 'update' operation — pass a dict of fields to change.")
+            current = await jf.get_item(item_id)
+            current.update(metadata)
+            data = await jf.update_item(item_id=item_id, metadata=current)
         elif operation == "delete":
             if not item_id:
                 raise ValueError("item_id is required for 'delete' operation.")

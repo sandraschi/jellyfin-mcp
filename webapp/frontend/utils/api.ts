@@ -1,4 +1,8 @@
-const BASE = '/api';
+/** Empty in dev (Next rewrites); direct backend URL in Tauri production build. */
+export const API_BASE =
+  process.env.NODE_ENV === 'development' ? '' : 'http://127.0.0.1:10934';
+
+const BASE = `${API_BASE}/api`;
 
 interface LibraryItem {
   id: string;
@@ -58,11 +62,32 @@ async function fetchAPI(path: string, options?: RequestInit) {
     const text = await res.text();
     throw new Error(text || `API error: ${res.status}`);
   }
-  return res.json();
+  const json = await res.json();
+  if (
+    json &&
+    typeof json === 'object' &&
+    !Array.isArray(json) &&
+    'success' in json &&
+    'data' in json
+  ) {
+    return json.data;
+  }
+  return json;
+}
+
+function asItemArray<T>(data: unknown): T[] {
+  if (Array.isArray(data)) {
+    return data;
+  }
+  if (data && typeof data === 'object' && 'Items' in data) {
+    const items = (data as { Items?: T[] }).Items;
+    return Array.isArray(items) ? items : [];
+  }
+  return [];
 }
 
 export async function fetchSystemInfo(): Promise<SystemInfo> {
-  return fetchAPI('/system/info');
+  return fetchAPI('/server/info');
 }
 
 export async function fetchLibraries(): Promise<LibraryItem[]> {
@@ -82,11 +107,11 @@ export async function fetchMedia(
 }
 
 export async function fetchSearch(query: string): Promise<MediaItem[]> {
-  return fetchAPI(`/search?q=${encodeURIComponent(query)}`) || [];
+  return fetchAPI(`/search?query=${encodeURIComponent(query)}`) || [];
 }
 
 export async function fetchSessions(): Promise<Session[]> {
-  return fetchAPI('/sessions') || [];
+  return fetchAPI('/playback/sessions') || [];
 }
 
 export async function sendPlaybackCommand(
@@ -125,15 +150,15 @@ export async function installPlugin(pluginId: string) {
 }
 
 export async function fetchLiveTvChannels() {
-  return fetchAPI('/livetv/channels') || [];
+  return asItemArray(await fetchAPI('/livetv/channels'));
 }
 
 export async function fetchEpgGuide() {
-  return fetchAPI('/livetv/epg') || [];
+  return asItemArray(await fetchAPI('/livetv/guide'));
 }
 
 export async function fetchRecordings() {
-  return fetchAPI('/livetv/recordings') || [];
+  return asItemArray(await fetchAPI('/livetv/recordings'));
 }
 
 export async function fetchUsers() {
@@ -181,7 +206,7 @@ export async function syncRag() {
 }
 
 export async function searchRag(query: string) {
-  return fetchAPI(`/rag/search?q=${encodeURIComponent(query)}`);
+  return fetchAPI(`/rag/search?query=${encodeURIComponent(query)}`);
 }
 
 export async function fetchChatHistory() {

@@ -5,6 +5,7 @@ from typing import Annotated, Any, Literal
 from pydantic import Field
 
 from ...app import mcp
+from ...services.registry import get_jellyfin_service
 from ...utils import get_logger
 
 logger = get_logger(__name__)
@@ -41,21 +42,29 @@ async def jellyfin_subtitle(
         if operation == "search":
             if not item_id:
                 return {"success": False, "error": "item_id is required for search", "error_code": "MISSING_ITEM_ID"}
+            jf = await get_jellyfin_service()
+            lang = language or "eng"
+            results = await jf.search_subtitles(item_id, language=lang)
+            items = results.get("SearchResults", results) if isinstance(results, dict) else results
             return {
                 "success": True,
                 "operation": "search",
-                "message": "Subtitle search results",
-                "data": {"item_id": item_id, "language": language, "results": []},
+                "message": f"Found {len(items) if isinstance(items, list) else 0} subtitle results",
+                "data": {"item_id": item_id, "language": lang, "results": items},
             }
 
         if operation == "download":
             if not item_id:
                 return {"success": False, "error": "item_id is required for download", "error_code": "MISSING_ITEM_ID"}
+            if not subtitle_id:
+                return {"success": False, "error": "subtitle_id is required for download", "error_code": "MISSING_SUBTITLE_ID"}
+            jf = await get_jellyfin_service()
+            result = await jf.download_subtitles(item_id, subtitle_id)
             return {
                 "success": True,
                 "operation": "download",
-                "message": "Subtitle download initiated",
-                "data": {"item_id": item_id, "subtitle_id": subtitle_id, "provider": provider},
+                "message": "Subtitle downloaded",
+                "data": {"item_id": item_id, "subtitle_id": subtitle_id, "provider": provider, "result": result},
             }
 
         if operation == "upload":
@@ -64,18 +73,22 @@ async def jellyfin_subtitle(
             return {
                 "success": True,
                 "operation": "upload",
-                "message": "Subtitle upload placeholder",
+                "message": "Subtitle upload requires a file — not supported via MCP text interface",
                 "data": {"item_id": item_id, "language": language},
             }
 
         if operation == "delete":
             if not item_id:
                 return {"success": False, "error": "item_id is required for delete", "error_code": "MISSING_ITEM_ID"}
+            if not subtitle_id:
+                return {"success": False, "error": "subtitle_id is required for delete", "error_code": "MISSING_SUBTITLE_ID"}
+            jf = await get_jellyfin_service()
+            result = await jf._delete(f"/Videos/{item_id}/Subtitles/{subtitle_id}")
             return {
                 "success": True,
                 "operation": "delete",
                 "message": "Subtitle deleted",
-                "data": {"item_id": item_id, "subtitle_id": subtitle_id},
+                "data": {"item_id": item_id, "subtitle_id": subtitle_id, "result": result},
             }
 
         if operation == "sync":

@@ -2,15 +2,11 @@
 
 import logging
 
-import httpx
-
 from .base import ServiceError
 
 
 class PluginService:
     """Manage Jellyfin plugins: catalog browsing, install, configure."""
-
-    CATALOG_URL = "https://raw.githubusercontent.com/jellyfin/jellyfin-plugin-manifest/master/manifest.json"
 
     def __init__(self, jellyfin_service):
         self._jf = jellyfin_service
@@ -18,28 +14,26 @@ class PluginService:
         self._catalog_cache: list[dict] | None = None
 
     async def get_catalog(self) -> list[dict]:
-        """Fetch plugin catalog from Jellyfin's manifest."""
+        """Fetch plugin catalog from the Jellyfin server."""
         if self._catalog_cache:
             return self._catalog_cache
 
         try:
-            async with httpx.AsyncClient(timeout=30) as client:
-                resp = await client.get(self.CATALOG_URL)
-                data = resp.json()
-                plugins = []
-                for entry in data if isinstance(data, list) else data.get("plugins", []):
-                    plugins.append({
-                        "id": entry.get("id", entry.get("guid", "")),
-                        "name": entry.get("name", entry.get("id", "Unknown")),
-                        "description": entry.get("description", ""),
-                        "category": entry.get("category", "general"),
-                        "version": entry.get("version", "unknown"),
-                        "url": entry.get("sourceUrl", ""),
-                    })
-                self._catalog_cache = plugins
-                return plugins
+            data = await self._jf.get_plugin_manifest()
+            plugins = []
+            for entry in data if isinstance(data, list) else data.get("plugins", []):
+                plugins.append({
+                    "id": entry.get("guid", entry.get("id", "")),
+                    "name": entry.get("name", entry.get("id", "Unknown")),
+                    "description": entry.get("description", entry.get("overview", "")),
+                    "category": entry.get("category", entry.get("categoryName", "general")),
+                    "version": entry.get("version", entry.get("versions", [{}])[0].get("version", "unknown") if entry.get("versions") else "unknown"),
+                    "url": entry.get("sourceUrl", entry.get("sourceUrl", "")),
+                })
+            self._catalog_cache = plugins
+            return plugins
         except Exception as e:
-            raise ServiceError(f"Failed to fetch plugin catalog: {e}")
+            raise ServiceError(f"Failed to fetch plugin catalog: {e}") from e
 
     async def get_installed(self) -> list[dict]:
         """List installed plugins from Jellyfin server."""

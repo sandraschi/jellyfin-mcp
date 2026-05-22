@@ -28,8 +28,12 @@ if not _is_stdio_mode:
     _mcp_app = mcp.http_app(
         middleware=[
             Middleware(
-                CORSMiddleware, allow_origins=["*"], allow_credentials=True,
-                allow_methods=["*"], allow_headers=["*"]
+                CORSMiddleware,
+                allow_origins=["http://localhost:10935", "http://127.0.0.1:10935",
+                               "http://localhost:10934", "http://127.0.0.1:10934"],
+                allow_credentials=True,
+                allow_methods=["*"],
+                allow_headers=["*"],
             )
         ]
     )

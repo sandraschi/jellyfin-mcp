@@ -1066,21 +1066,6 @@ wheels = [
 ]
 
 [[package]]
-name = "jellyfin-apiclient-python"
-version = "1.12.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "certifi" },
-    { name = "requests" },
-    { name = "urllib3" },
-    { name = "websocket-client" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/a4/d5/7e1172c59aab6e62d5aee60de9d026d29c2f4347d5325a7b0c6eefb7dcf1/jellyfin_apiclient_python-1.12.0.tar.gz", hash = "sha256:65aca991ccb2b12fbe8ee5ddf90b6d7ebe3630943ccd8d3f9735199b9e34cf34", size = 67628, upload-time = "2026-05-04T01:59:46.915Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/33/95/1f2ede635bb83fadec58d148fec1fae7e4303c7a60b405239af5c8082071/jellyfin_apiclient_python-1.12.0-py3-none-any.whl", hash = "sha256:d80c46f24944d675028655488c0b873ee4327a5f16ade6177a9788af364ed902", size = 55692, upload-time = "2026-05-04T01:59:45.686Z" },
-]
-
-[[package]]
 name = "jinja2"
 version = "3.1.6"
 source = { registry = "https://pypi.org/simple" }
@@ -2655,8 +2640,6 @@ dependencies = [
     { name = "fastapi" },
     { name = "fastmcp" },
     { name = "httpx" },
-    { name = "jellyfin-apiclient-python" },
-    { name = "lancedb" },
     { name = "prefab-ui" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -2666,7 +2649,6 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
     { name = "rich" },
-    { name = "sentence-transformers" },
     { name = "uvicorn", extra = ["standard"] },
     { name = "websockets" },
 ]
@@ -2680,6 +2662,10 @@ dev = [
     { name = "pytest-cov" },
     { name = "ruff" },
 ]
+rag = [
+    { name = "lancedb" },
+    { name = "sentence-transformers" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -2688,8 +2674,7 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.104.0" },
     { name = "fastmcp", specifier = ">=3.2.0" },
     { name = "httpx", specifier = ">=0.25.0" },
-    { name = "jellyfin-apiclient-python", specifier = ">=1.10.0" },
-    { name = "lancedb", specifier = ">=0.4.0" },
+    { name = "lancedb", marker = "extra == 'rag'", specifier = ">=0.4.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.8.0,<2.0.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.6.0" },
     { name = "prefab-ui", specifier = ">=0.18.0" },
@@ -2705,11 +2690,11 @@ requires-dist = [
     { name = "requests", specifier = ">=2.31.0" },
     { name = "rich", specifier = ">=13.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.14.0" },
-    { name = "sentence-transformers", specifier = ">=2.2.0" },
+    { name = "sentence-transformers", marker = "extra == 'rag'", specifier = ">=2.2.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.24.0" },
     { name = "websockets", specifier = ">=12.0" },
 ]
-provides-extras = ["dev"]
+provides-extras = ["rag", "dev"]
 
 [[package]]
 name = "scikit-learn"
@@ -3250,15 +3235,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/56/fe/cb8ef3d6f929d14158fdaaad9925985b7310abc9384dcd4d82dd0016fb59/watchfiles-1.2.0-cp315-cp315-manylinux_2_31_riscv64.whl", hash = "sha256:cee9d5efd929efdac5f7e58f72b3376f676b64050a91c5b99a7094c5b2317488", size = 465096, upload-time = "2026-05-18T04:31:30.384Z" },
     { url = "https://files.pythonhosted.org/packages/25/91/80908e835e100527a9267147b08c0eee1fa6ab0ffec15edc04d1d44885f7/watchfiles-1.2.0-cp315-cp315-musllinux_1_1_aarch64.whl", hash = "sha256:b718bf356bbc15e559bd8ef41782b573b8ae0e3f177ab244b440568d7ea02cfb", size = 630638, upload-time = "2026-05-18T04:30:49.89Z" },
     { url = "https://files.pythonhosted.org/packages/46/4b/95ab2f256bb4af3cb2eb23b9317bda984ee6e0f11733a5c004a6c95b06e3/watchfiles-1.2.0-cp315-cp315-musllinux_1_1_x86_64.whl", hash = "sha256:922c0e019fe68b3ae392965a766b02a71ba1168c932cebc3733cd52c5fe5b377", size = 657684, upload-time = "2026-05-18T04:31:32.027Z" },
-]
-
-[[package]]
-name = "websocket-client"
-version = "1.9.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/2c/41/aa4bf9664e4cda14c3b39865b12251e8e7d239f4cd0e3cc1b6c2ccde25c1/websocket_client-1.9.0.tar.gz", hash = "sha256:9e813624b6eb619999a97dc7958469217c3176312b3a16a4bd1bc7e08a46ec98", size = 70576, upload-time = "2025-10-07T21:16:36.495Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/db/b10e48aa8fff7407e67470363eac595018441cf32d5e1001567a7aeba5d2/websocket_client-1.9.0-py3-none-any.whl", hash = "sha256:af248a825037ef591efbf6ed20cc5faa03d3b47b9e5a2230a529eeee1c1fc3ef", size = 82616, upload-time = "2025-10-07T21:16:34.951Z" },
 ]
 
 [[package]]

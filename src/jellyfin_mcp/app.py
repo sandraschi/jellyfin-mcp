@@ -53,10 +53,15 @@ if _is_stdio_mode:
 @asynccontextmanager
 async def _jellyfin_lifespan(app):
     """FastMCP 3.2 lifespan hook — connect/disconnect Jellyfin."""
-    try:
-        from .config import get_settings
-        from .services.jellyfin_service import JellyfinService
+    from .config import get_settings
+    from .services.jellyfin_service import JellyfinService
+    from .services.registry import clear_services, set_jellyfin_service, set_ws_service
+    from .utils import get_logger
 
+    lifespan_logger = get_logger(__name__)
+    settings = None
+
+    try:
         settings = get_settings()
         if settings.api_key:
             service = JellyfinService(
@@ -65,27 +70,29 @@ async def _jellyfin_lifespan(app):
                 timeout=settings.timeout,
             )
             await service.connect()
+            set_jellyfin_service(service)
             app.state.jellyfin_service = service
-    except Exception:
-        pass
+        else:
+            lifespan_logger.warning("JELLYFIN_API_KEY not set — Jellyfin service unavailable")
+    except Exception as e:
+        lifespan_logger.warning("Jellyfin service initialization failed: %s", e)
 
     try:
-        if settings.ws_enabled:
+        if settings and settings.api_key and settings.ws_enabled:
             from .services.websocket_service import WebSocketService
+
             ws_service = WebSocketService(base_url=settings.server_url, api_key=settings.api_key)
             await ws_service.start()
+            set_ws_service(ws_service)
             app.state.ws_service = ws_service
-    except Exception:
-        pass
+    except Exception as e:
+        lifespan_logger.warning("WebSocket service initialization failed: %s", e)
 
     yield
 
-    ws = getattr(app.state, "ws_service", None)
-    if ws:
-        await ws.stop()
-    jf = getattr(app.state, "jellyfin_service", None)
-    if jf:
-        await jf.disconnect()
+    await clear_services()
+    app.state.jellyfin_service = None
+    app.state.ws_service = None
 
 
 _sampling_config = JellyfinSamplingConfig.from_env()
