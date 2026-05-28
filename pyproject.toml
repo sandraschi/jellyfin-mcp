@@ -3,7 +3,7 @@ requires = ["hatchling", "uv-dynamic-versioning>=0.7.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "schip-mcp-jellyfin"
+name = "jellyfin-mcp"
 version = "0.1.0"
 description = "FastMCP 3.2+ server for Jellyfin Media Server — open-source Plex alternative with plugins, WebSocket real-time events, and full OpenAPI. Includes React webapp + Tauri native wrapper."
 readme = "README.md"
