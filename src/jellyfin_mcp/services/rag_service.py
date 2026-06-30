@@ -27,30 +27,22 @@ class RAGService:
             import lancedb
             from sentence_transformers import SentenceTransformer
         except ImportError as exc:
-            raise ImportError(
-                "RAG dependencies not installed. "
-                "Run: pip install lancedb sentence-transformers"
-            ) from exc
+            raise ImportError("RAG dependencies not installed. Run: pip install lancedb sentence-transformers") from exc
 
         if not self._model:
-            self._model = await self._run_in_executor(
-                lambda: SentenceTransformer("all-MiniLM-L6-v2")
-            )
+            self._model = await self._run_in_executor(lambda: SentenceTransformer("all-MiniLM-L6-v2"))
         Path(self._db_path).mkdir(parents=True, exist_ok=True)
-        self._db = await self._run_in_executor(
-            lambda: lancedb.connect(self._db_path)
-        )
+        self._db = await self._run_in_executor(lambda: lancedb.connect(self._db_path))
         # Reattach existing table if present
         if self._db and self._table is None:
             try:
-                self._table = await self._run_in_executor(
-                    lambda: self._db.open_table("metadata")
-                )
+                self._table = await self._run_in_executor(lambda: self._db.open_table("metadata"))
             except Exception:
                 pass  # Table doesn't exist yet — will be created on first sync
 
     async def _run_in_executor(self, func, *args):
         import asyncio
+
         loop = asyncio.get_running_loop()
         return await loop.run_in_executor(None, func, *args)
 
@@ -71,16 +63,16 @@ class RAGService:
                 + str(item.get("production_year", ""))
             ).strip()
             if text:
-                embedding = await self._run_in_executor(
-                    self._model.encode, text
+                embedding = await self._run_in_executor(self._model.encode, text)
+                documents.append(
+                    {
+                        "item_id": item.get("id", item.get("Id", "")),
+                        "name": item.get("name", ""),
+                        "type": item.get("type", item.get("Type", "")),
+                        "text": text,
+                        "vector": embedding.tolist(),
+                    }
                 )
-                documents.append({
-                    "item_id": item.get("id", item.get("Id", "")),
-                    "name": item.get("name", ""),
-                    "type": item.get("type", item.get("Type", "")),
-                    "text": text,
-                    "vector": embedding.tolist(),
-                })
 
         if documents:
             table = pa.Table.from_pylist(documents)
@@ -98,9 +90,7 @@ class RAGService:
             self._logger.warning("No RAG table — run sync first")
             return []
 
-        query_embedding = await self._run_in_executor(
-            self._model.encode, query
-        )
+        query_embedding = await self._run_in_executor(self._model.encode, query)
 
         results = await self._run_in_executor(
             lambda: self._table.search(query_embedding.tolist()).limit(limit).to_list()
@@ -121,9 +111,7 @@ class RAGService:
         await self.initialize()
         row_count = 0
         if self._table:
-            row_count = await self._run_in_executor(
-                lambda: self._table.count_rows()
-            )
+            row_count = await self._run_in_executor(lambda: self._table.count_rows())
         return {
             "indexed_items": row_count,
             "db_path": self._db_path,
@@ -135,9 +123,7 @@ class RAGService:
         await self.initialize()
         if self._db:
             try:
-                await self._run_in_executor(
-                    lambda: self._db.drop_table("metadata")
-                )
+                await self._run_in_executor(lambda: self._db.drop_table("metadata"))
             except Exception:
                 pass  # Already absent
         self._table = None

@@ -1,0 +1,107 @@
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning>=0.7.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jellyfin-mcp"
+version = "0.1.0"
+description = "FastMCP 3.2+ server for Jellyfin Media Server — open-source Plex alternative with plugins, WebSocket real-time events, and full OpenAPI. Includes React webapp + Tauri native wrapper."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [
+    { name = "Sandra Schipal", email = "sandra@schipal.at" }
+]
+keywords = ["mcp", "jellyfin", "media", "streaming", "fastmcp", "jellyfin++"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Video",
+    "Topic :: Multimedia :: Sound/Audio",
+    "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
+
+dependencies = [
+    "fastmcp>=3.2.0",
+    "prefab-ui>=0.18.0",
+    "aiohttp>=3.9.0,<4.0.0",
+    "aiofiles>=23.2.0,<24.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+    "pydantic-settings>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "pyyaml>=6.0.0,<7.0.0",
+    "requests>=2.31.0",
+    "pytz>=2024.1",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "httpx>=0.25.0",
+    "python-multipart>=0.0.6",
+    "rich>=13.0.0",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+rag = [
+    "lancedb>=0.4.0",
+    "sentence-transformers>=2.2.0",
+]
+dev = [
+    "pytest>=8.0.0,<9.0.0",
+    "pytest-asyncio>=0.23.0,<1.0.0",
+    "pytest-cov>=4.0.0,<5.0.0",
+    "ruff>=0.14.0",
+    "mypy>=1.8.0,<2.0.0",
+    "pre-commit>=3.6.0",
+]
+
+[project.scripts]
+jellyfin-mcp = "jellyfin_mcp.server:main"
+
+[project.urls]
+Homepage = "https://github.com/sandraschi/jellyfin-mcp"
+Repository = "https://github.com/sandraschi/jellyfin-mcp.git"
+Documentation = "https://github.com/sandraschi/jellyfin-mcp#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/jellyfin_mcp"]
+
+[tool.uv-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "N", "S", "A", "C4", "T20", "RET", "SIM", "ARG", "TRY"]
+ignore = ["E501", "E402", "B008", "TRY003", "TRY300", "TRY301", "TRY400", "TRY401", "ARG001", "ARG002", "A002", "A001", "N802", "N816", "S110", "B904", "SIM105", "UP041"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: tests requiring a live Jellyfin server (JELLYFIN_URL + JELLYFIN_API_KEY)",
+    "slow: tests that load heavy models or take more than 5 seconds",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+addopts = "-ra --strict-markers"

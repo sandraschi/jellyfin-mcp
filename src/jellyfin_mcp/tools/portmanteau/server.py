@@ -13,9 +13,16 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_server(
     operation: Annotated[
         Literal[
-            "status", "info", "health", "logs",
-            "restart", "shutdown", "updates",
-            "tasks", "task_run", "transcode_queue",
+            "status",
+            "info",
+            "health",
+            "logs",
+            "restart",
+            "shutdown",
+            "updates",
+            "tasks",
+            "task_run",
+            "transcode_queue",
         ],
         Field(description="Server operation to perform."),
     ],

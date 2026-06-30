@@ -13,19 +13,30 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_metadata(
     operation: Annotated[
         Literal[
-            "get", "update", "refresh", "identify",
-            "images", "backdrops", "providers",
-            "lock", "unlock", "fetch",
+            "get",
+            "update",
+            "refresh",
+            "identify",
+            "images",
+            "backdrops",
+            "providers",
+            "lock",
+            "unlock",
+            "fetch",
         ],
         Field(description="Metadata operation to perform."),
     ],
     item_id: Annotated[str | None, Field(description="Item ID (required for most operations).")] = None,
-    metadata: Annotated[dict[str, Any] | None, Field(description="Metadata fields to update (required for update/identify).")] = None,
+    metadata: Annotated[
+        dict[str, Any] | None, Field(description="Metadata fields to update (required for update/identify).")
+    ] = None,
     image_type: Annotated[
         Literal["Primary", "Backdrop", "Logo", "Thumb", "Banner", "Disc", "Box", "Screenshot", "Menu"] | None,
         Field(description="Image type for image-related operations."),
     ] = None,
-    provider_id: Annotated[str | None, Field(description="Metadata provider ID (required for fetch/providers).")] = None,
+    provider_id: Annotated[
+        str | None, Field(description="Metadata provider ID (required for fetch/providers).")
+    ] = None,
     search_name: Annotated[str | None, Field(description="Search name for identify/fetch operations.")] = None,
     year: Annotated[int | None, Field(description="Year for identify/fetch operations.")] = None,
 ) -> ToolResult:
@@ -57,7 +68,9 @@ async def jellyfin_metadata(
         elif operation == "refresh":
             if not item_id:
                 raise ValueError("item_id is required for 'refresh' operation.")
-            data = await jf._post(f"/Items/{item_id}/Refresh", json_body={"Recursive": True, "MetadataRefreshMode": "FullRefresh"})
+            data = await jf._post(
+                f"/Items/{item_id}/Refresh", json_body={"Recursive": True, "MetadataRefreshMode": "FullRefresh"}
+            )
         elif operation == "identify":
             if not item_id:
                 raise ValueError("item_id is required for 'identify' operation.")
@@ -70,7 +83,9 @@ async def jellyfin_metadata(
                 body["ProviderIds"] = {provider_id: search_name or ""}
             if metadata:
                 body.update(metadata)
-            data = await jf._post(f"/Items/{item_id}/RemoteSearch/Apply", json_body=body or {"SearchName": search_name or ""})
+            data = await jf._post(
+                f"/Items/{item_id}/RemoteSearch/Apply", json_body=body or {"SearchName": search_name or ""}
+            )
         elif operation == "images":
             if not item_id:
                 raise ValueError("item_id is required for 'images' operation.")

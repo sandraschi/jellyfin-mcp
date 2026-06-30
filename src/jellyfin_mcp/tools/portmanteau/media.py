@@ -13,13 +13,23 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_media(
     operation: Annotated[
         Literal[
-            "browse", "search", "get", "get_recent", "get_recommended",
-            "similar", "stream_info", "refresh", "update", "delete",
+            "browse",
+            "search",
+            "get",
+            "get_recent",
+            "get_recommended",
+            "similar",
+            "stream_info",
+            "refresh",
+            "update",
+            "delete",
         ],
         Field(description="Media operation to perform."),
     ],
     library_id: Annotated[str | None, Field(description="Library/parent ID for browsing or recent items.")] = None,
-    item_id: Annotated[str | None, Field(description="Item ID (required for get/similar/stream_info/refresh/update/delete).")] = None,
+    item_id: Annotated[
+        str | None, Field(description="Item ID (required for get/similar/stream_info/refresh/update/delete).")
+    ] = None,
     query: Annotated[str | None, Field(description="Search term for browsing within a library.")] = None,
     media_type: Annotated[
         Literal["Movie", "Series", "MusicArtist", "Audio", "Photo"] | None,
@@ -28,8 +38,15 @@ async def jellyfin_media(
     sort_by: Annotated[str, Field(description="Sort field. Default: SortName.")] = "SortName",
     sort_order: Annotated[Literal["Ascending", "Descending"], Field(description="Sort direction.")] = "Ascending",
     limit: Annotated[int, Field(description="Max items to return.", ge=1, le=500)] = 50,
-    filters: Annotated[str | None, Field(description="Comma-separated Jellyfin filters (e.g. 'IsUnplayed,IsFavorite').")] = None,
-    metadata: Annotated[dict | None, Field(description="Metadata fields to update (for 'update' operation). Merged with the current item before posting.")] = None,
+    filters: Annotated[
+        str | None, Field(description="Comma-separated Jellyfin filters (e.g. 'IsUnplayed,IsFavorite').")
+    ] = None,
+    metadata: Annotated[
+        dict | None,
+        Field(
+            description="Metadata fields to update (for 'update' operation). Merged with the current item before posting."
+        ),
+    ] = None,
 ) -> ToolResult:
     """Browse and manage Jellyfin media items: browse library, search, get details, similar, stream info, CRUD.
 
@@ -47,7 +64,10 @@ async def jellyfin_media(
 
         if operation == "browse":
             kwargs = {
-                "sort_by": sort_by, "sort_order": sort_order, "limit": limit, "recursive": True,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+                "limit": limit,
+                "recursive": True,
             }
             if library_id:
                 kwargs["parent_id"] = library_id
@@ -60,7 +80,10 @@ async def jellyfin_media(
             if not query:
                 raise ValueError("query is required for 'search' operation.")
             kwargs = {
-                "sort_by": sort_by, "sort_order": sort_order, "limit": limit, "recursive": True,
+                "sort_by": sort_by,
+                "sort_order": sort_order,
+                "limit": limit,
+                "recursive": True,
                 "search_term": query,
             }
             if media_type:

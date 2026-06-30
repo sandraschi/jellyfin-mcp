@@ -47,7 +47,9 @@ class EnrichmentService:
                     "overview": best.get("overview"),
                     "rating": best.get("vote_average"),
                     "year": (best.get("release_date") or best.get("first_air_date", ""))[:4],
-                    "poster": f"https://image.tmdb.org/t/p/w500{best.get('poster_path')}" if best.get("poster_path") else None,
+                    "poster": f"https://image.tmdb.org/t/p/w500{best.get('poster_path')}"
+                    if best.get("poster_path")
+                    else None,
                 }
         except Exception as e:
             self._logger.debug("TMDB enrichment failed: %s", e)
@@ -57,9 +59,7 @@ class EnrichmentService:
         """Fetch summary from Wikipedia."""
         try:
             async with httpx.AsyncClient(timeout=10) as client:
-                resp = await client.get(
-                    f"{self.WIKIPEDIA_BASE}/page/summary/{title.replace(' ', '_')}"
-                )
+                resp = await client.get(f"{self.WIKIPEDIA_BASE}/page/summary/{title.replace(' ', '_')}")
                 if resp.status_code == 200:
                     data = resp.json()
                     return {

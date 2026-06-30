@@ -13,19 +13,36 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_library(
     operation: Annotated[
         Literal[
-            "list", "get", "create", "update", "delete", "scan", "refresh",
-            "stats", "cleanup", "add_path", "remove_path", "optimize",
-            "empty_trash", "reorder", "configure",
+            "list",
+            "get",
+            "create",
+            "update",
+            "delete",
+            "scan",
+            "refresh",
+            "stats",
+            "cleanup",
+            "add_path",
+            "remove_path",
+            "optimize",
+            "empty_trash",
+            "reorder",
+            "configure",
         ],
         Field(description="Library operation to perform."),
     ],
-    library_id: Annotated[str | None, Field(description="Library ID (required for get/update/delete/scan/refresh/stats/cleanup/path operations).")] = None,
+    library_id: Annotated[
+        str | None,
+        Field(description="Library ID (required for get/update/delete/scan/refresh/stats/cleanup/path operations)."),
+    ] = None,
     name: Annotated[str | None, Field(description="Library name (required for create, optional for update).")] = None,
     library_type: Annotated[
         Literal["movie", "show", "music", "photo", "homevideos", "book"] | None,
         Field(description="Collection type for library creation: movie, show, music, photo, homevideos, book."),
     ] = None,
-    path: Annotated[str | None, Field(description="Filesystem path (required for create, add_path, remove_path).")] = None,
+    path: Annotated[
+        str | None, Field(description="Filesystem path (required for create, add_path, remove_path).")
+    ] = None,
     force: Annotated[bool, Field(description="Force the operation (e.g. full refresh, skip confirmation).")] = False,
 ) -> ToolResult:
     """Manage Jellyfin libraries: list, create, scan, refresh, stats, cleanup, and path management.
@@ -51,11 +68,17 @@ async def jellyfin_library(
             if not name or not library_type or not path:
                 raise ValueError("name, library_type, and path are required for 'create' operation.")
             type_map = {
-                "movie": "movies", "show": "tvshows", "music": "music",
-                "photo": "photos", "homevideos": "homevideos", "book": "books",
+                "movie": "movies",
+                "show": "tvshows",
+                "music": "music",
+                "photo": "photos",
+                "homevideos": "homevideos",
+                "book": "books",
             }
             data = await jf.create_library(
-                name=name, collection_type=type_map.get(library_type, library_type), paths=[path],
+                name=name,
+                collection_type=type_map.get(library_type, library_type),
+                paths=[path],
             )
         elif operation == "update":
             if not library_id:
@@ -86,7 +109,10 @@ async def jellyfin_library(
         elif operation == "cleanup":
             if not library_id:
                 raise ValueError("library_id is required for 'cleanup' operation.")
-            await jf._post("/Library/VirtualFolders/Refresh", json_body={"Recursive": True, "ImageRefreshMode": "FullRefresh", "MetadataRefreshMode": "FullRefresh"})
+            await jf._post(
+                "/Library/VirtualFolders/Refresh",
+                json_body={"Recursive": True, "ImageRefreshMode": "FullRefresh", "MetadataRefreshMode": "FullRefresh"},
+            )
             data = {"message": f"Library {library_id} cleanup (full refresh) triggered."}
         elif operation == "add_path":
             if not library_id or not path:

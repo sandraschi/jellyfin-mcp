@@ -217,7 +217,9 @@ async def jellyfin_reporting(
             "success": False,
             "error": f"Unknown operation: {operation}",
             "error_code": "INVALID_OPERATION",
-            "suggestions": ["Valid operations: stats, popular, recent, genres, resolution, codec, user_activity, export"],
+            "suggestions": [
+                "Valid operations: stats, popular, recent, genres, resolution, codec, user_activity, export"
+            ],
         }
 
     except Exception as e:

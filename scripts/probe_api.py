@@ -1,4 +1,5 @@
 """Probe Jellyfin API paths for test fixes."""
+
 import asyncio
 
 from jellyfin_mcp.config import get_settings

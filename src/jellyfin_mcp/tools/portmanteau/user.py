@@ -13,15 +13,30 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_user(
     operation: Annotated[
         Literal[
-            "list", "get", "create", "update", "delete",
-            "policy", "password", "sessions", "activity", "devices",
+            "list",
+            "get",
+            "create",
+            "update",
+            "delete",
+            "policy",
+            "password",
+            "sessions",
+            "activity",
+            "devices",
         ],
         Field(description="User operation to perform."),
     ],
-    user_id: Annotated[str | None, Field(description="User ID (required for get/update/delete/policy/password/sessions/activity).")] = None,
+    user_id: Annotated[
+        str | None, Field(description="User ID (required for get/update/delete/policy/password/sessions/activity).")
+    ] = None,
     name: Annotated[str | None, Field(description="Username (required for create, optional for update).")] = None,
-    password: Annotated[str | None, Field(description="Password (required for create and password operations).")] = None,
-    policy: Annotated[dict | None, Field(description="User policy dict (required for 'policy' operation). See Jellyfin UserPolicy schema.")] = None,
+    password: Annotated[
+        str | None, Field(description="Password (required for create and password operations).")
+    ] = None,
+    policy: Annotated[
+        dict | None,
+        Field(description="User policy dict (required for 'policy' operation). See Jellyfin UserPolicy schema."),
+    ] = None,
     enabled: Annotated[bool | None, Field(description="Enable or disable the user (for update).")] = None,
 ) -> ToolResult:
     """Manage Jellyfin users: list, create, update, delete, policy, change password, view sessions and devices.
@@ -74,7 +89,9 @@ async def jellyfin_user(
                 raise ValueError("user_id is required for 'password' operation.")
             if not password:
                 raise ValueError("password is required for 'password' operation.")
-            data = await jf._post(f"/Users/{user_id}/Password", json_body={"Id": user_id, "CurrentPw": "", "NewPw": password})
+            data = await jf._post(
+                f"/Users/{user_id}/Password", json_body={"Id": user_id, "CurrentPw": "", "NewPw": password}
+            )
         elif operation == "sessions":
             if not user_id:
                 raise ValueError("user_id is required for 'sessions' operation.")

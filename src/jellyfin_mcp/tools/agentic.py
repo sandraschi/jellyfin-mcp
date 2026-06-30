@@ -62,7 +62,11 @@ def register_agentic_jellyfin_tools(mcp):
         try:
             if operation == "workflow":
                 if not prompt:
-                    return {"success": False, "error": "prompt is required for workflow", "error_code": "MISSING_PROMPT"}
+                    return {
+                        "success": False,
+                        "error": "prompt is required for workflow",
+                        "error_code": "MISSING_PROMPT",
+                    }
 
                 if ctx is None:
                     return {
@@ -86,7 +90,11 @@ def register_agentic_jellyfin_tools(mcp):
 
             if operation == "natural_query":
                 if not prompt:
-                    return {"success": False, "error": "prompt is required for natural_query", "error_code": "MISSING_PROMPT"}
+                    return {
+                        "success": False,
+                        "error": "prompt is required for natural_query",
+                        "error_code": "MISSING_PROMPT",
+                    }
 
                 if ctx is None:
                     return {

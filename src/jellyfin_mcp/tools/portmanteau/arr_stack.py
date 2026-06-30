@@ -76,9 +76,17 @@ async def jellyfin_arr_stack(
             for svc in ["radarr", "sonarr", "lidarr"]:
                 data = await _query_arr_api(svc, "system/status")
                 if data is None:
-                    results[svc] = {"configured": False, "message": f"Not configured. Set {ARR_SERVICES[svc]['env_url']} env var."}
+                    results[svc] = {
+                        "configured": False,
+                        "message": f"Not configured. Set {ARR_SERVICES[svc]['env_url']} env var.",
+                    }
                 elif "_error" in data:
-                    results[svc] = {"configured": True, "reachable": False, "error": data["_error"], "url": data["_url"]}
+                    results[svc] = {
+                        "configured": True,
+                        "reachable": False,
+                        "error": data["_error"],
+                        "url": data["_url"],
+                    }
                 else:
                     results[svc] = {
                         "configured": True,
@@ -113,7 +121,9 @@ async def jellyfin_arr_stack(
         elif operation in ("radarr", "sonarr", "lidarr"):
             raw = await _query_arr_api(operation, "system/status")
             if raw is None:
-                data = {operation: {"configured": False, "message": f"Set {ARR_SERVICES[operation]['env_url']} env var."}}
+                data = {
+                    operation: {"configured": False, "message": f"Set {ARR_SERVICES[operation]['env_url']} env var."}
+                }
             elif "_error" in raw:
                 data = {operation: {"configured": True, "reachable": False, "error": raw["_error"], "url": raw["_url"]}}
             else:
@@ -126,7 +136,11 @@ async def jellyfin_arr_stack(
                         "version": raw.get("version", "unknown"),
                         "app_name": raw.get("appName", operation),
                         "health": health if health and "_error" not in health else None,
-                        "pending": len(queue) if isinstance(queue, list) else queue.get("totalRecords", 0) if isinstance(queue, dict) else 0,
+                        "pending": len(queue)
+                        if isinstance(queue, list)
+                        else queue.get("totalRecords", 0)
+                        if isinstance(queue, dict)
+                        else 0,
                     }
                 }
 

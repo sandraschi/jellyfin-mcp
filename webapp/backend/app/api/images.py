@@ -1,4 +1,5 @@
 """Image proxy API — forwards image requests to Jellyfin server."""
+
 import logging
 
 import httpx
@@ -6,7 +7,7 @@ from fastapi import APIRouter, Response
 from fastapi.responses import StreamingResponse
 from starlette.background import BackgroundTask
 
-from ..jel import get_base_url, get_api_key
+from ..jel import get_api_key, get_base_url
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

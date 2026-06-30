@@ -1,5 +1,5 @@
 """Settings management API endpoints."""
-import json
+
 import os
 from pathlib import Path
 
@@ -14,8 +14,14 @@ _settings_file = Path(__file__).resolve().parent.parent.parent / ".env"
 async def get_settings():
     """Get current backend settings (redacted API keys)."""
     keys = [
-        "JELLYFIN_URL", "JELLYFIN_SERVER_URL", "JELLYFIN_API_KEY", "JELLYFIN_TOKEN",
-        "JELLYFIN_WS_ENABLED", "LLM_BASE_URL", "LLM_API_KEY", "LLM_PROVIDER",
+        "JELLYFIN_URL",
+        "JELLYFIN_SERVER_URL",
+        "JELLYFIN_API_KEY",
+        "JELLYFIN_TOKEN",
+        "JELLYFIN_WS_ENABLED",
+        "LLM_BASE_URL",
+        "LLM_API_KEY",
+        "LLM_PROVIDER",
     ]
     values = {}
     for k in keys:
@@ -37,7 +43,6 @@ async def update_settings(data: dict):
             lines = _settings_file.read_text(encoding="utf-8").splitlines()
 
         updated_keys = set()
-        new_lines = []
         for key, value in data.items():
             key_upper = key.upper()
             updated_keys.add(key_upper)

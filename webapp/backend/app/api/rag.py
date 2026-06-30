@@ -1,4 +1,5 @@
 """RAG (Retrieval-Augmented Generation) API endpoints."""
+
 from fastapi import APIRouter, HTTPException, Query
 
 from ..jel import get_client
@@ -24,9 +25,7 @@ async def rag_sync():
                 lib_id = lib.get("ItemId") or lib.get("Id")
                 if not lib_id:
                     continue
-                items_resp = await client.get(
-                    "/Items", params={"ParentId": lib_id, "Recursive": "true", "Limit": 500}
-                )
+                items_resp = await client.get("/Items", params={"ParentId": lib_id, "Recursive": "true", "Limit": 500})
                 items_resp.raise_for_status()
                 item_data = items_resp.json()
                 total_items += len(item_data.get("Items", item_data))
@@ -35,7 +34,7 @@ async def rag_sync():
         _rag_status["item_count"] = total_items
         import datetime
 
-        _rag_status["last_sync"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+        _rag_status["last_sync"] = datetime.datetime.now(datetime.UTC).isoformat()
 
         return {"success": True, "data": _rag_status}
     except Exception as e:

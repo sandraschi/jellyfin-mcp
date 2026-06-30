@@ -43,7 +43,11 @@ async def jellyfin_enrichment(
 
         if operation == "tmdb":
             if not title:
-                return {"success": False, "error": "title is required for tmdb enrichment", "error_code": "MISSING_TITLE"}
+                return {
+                    "success": False,
+                    "error": "title is required for tmdb enrichment",
+                    "error_code": "MISSING_TITLE",
+                }
             result = await enrichment.enrich_from_tmdb(title=title, year=year, media_type=media_type or "movie")
             return {
                 "success": result is not None,
@@ -54,7 +58,11 @@ async def jellyfin_enrichment(
 
         if operation == "wikipedia":
             if not title:
-                return {"success": False, "error": "title is required for wikipedia enrichment", "error_code": "MISSING_TITLE"}
+                return {
+                    "success": False,
+                    "error": "title is required for wikipedia enrichment",
+                    "error_code": "MISSING_TITLE",
+                }
             result = await enrichment.enrich_from_wikipedia(title=title)
             return {
                 "success": result is not None,
@@ -73,7 +81,11 @@ async def jellyfin_enrichment(
 
         if operation == "batch":
             if not item_id and not title:
-                return {"success": False, "error": "item_id or title is required for batch enrichment", "error_code": "MISSING_PARAM"}
+                return {
+                    "success": False,
+                    "error": "item_id or title is required for batch enrichment",
+                    "error_code": "MISSING_PARAM",
+                }
             results = await enrichment.enrich(title=title or "", year=year, media_type=media_type or "movie")
             return {
                 "success": True,

@@ -1,0 +1,14 @@
+{
+  "product_name": "Jellyfin MCP",
+  "install_dir": "%LOCALAPPDATA%\\Jellyfin MCP",
+  "operator_exe": "jellyfin-mcp-native.exe",
+  "backend_process_names": ["jellyfin-mcp-native", "jellyfin-mcp-backend"],
+  "backend_port": 10934,
+  "health_path": "/health",
+  "diagnostics_path": "/api/v1/diagnostics",
+  "feature_smoke_path": "/api/server/status",
+  "window_title_re": "Jellyfin MCP",
+  "nsis_glob": "native/target/release/bundle/nsis/Jellyfin MCP_*_x64-setup.exe",
+  "bridge_ok_text": "jellyfin-mcp",
+  "uninstall_registry_filter": "*Jellyfin MCP*"
+}

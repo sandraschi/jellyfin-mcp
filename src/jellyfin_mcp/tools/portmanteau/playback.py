@@ -13,18 +13,37 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_playback(
     operation: Annotated[
         Literal[
-            "list_sessions", "play", "pause", "stop", "resume", "seek",
-            "skip_next", "skip_prev", "set_volume", "set_subtitle",
-            "set_audio", "set_quality",
+            "list_sessions",
+            "play",
+            "pause",
+            "stop",
+            "resume",
+            "seek",
+            "skip_next",
+            "skip_prev",
+            "set_volume",
+            "set_subtitle",
+            "set_audio",
+            "set_quality",
         ],
         Field(description="Playback operation to perform."),
     ],
-    session_id: Annotated[str | None, Field(description="Session ID (required for all operations except list_sessions).")] = None,
+    session_id: Annotated[
+        str | None, Field(description="Session ID (required for all operations except list_sessions).")
+    ] = None,
     item_ids: Annotated[list[str] | None, Field(description="List of item IDs to play (required for 'play').")] = None,
-    ticks: Annotated[int | None, Field(description="Seek position in ticks (1 tick = 100ns; required for 'seek').")] = None,
-    volume: Annotated[int | None, Field(description="Volume level 0-100 (required for 'set_volume').", ge=0, le=100)] = None,
-    subtitle_index: Annotated[int | None, Field(description="Subtitle stream index (required for 'set_subtitle').", ge=-1)] = None,
-    audio_index: Annotated[int | None, Field(description="Audio stream index (required for 'set_audio').", ge=0)] = None,
+    ticks: Annotated[
+        int | None, Field(description="Seek position in ticks (1 tick = 100ns; required for 'seek').")
+    ] = None,
+    volume: Annotated[
+        int | None, Field(description="Volume level 0-100 (required for 'set_volume').", ge=0, le=100)
+    ] = None,
+    subtitle_index: Annotated[
+        int | None, Field(description="Subtitle stream index (required for 'set_subtitle').", ge=-1)
+    ] = None,
+    audio_index: Annotated[
+        int | None, Field(description="Audio stream index (required for 'set_audio').", ge=0)
+    ] = None,
     quality: Annotated[str | None, Field(description="Streaming quality preset (required for 'set_quality').")] = None,
     start_index: Annotated[int, Field(description="Index in the item list to start playback from (for 'play').")] = 0,
 ) -> ToolResult:

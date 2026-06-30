@@ -20,7 +20,9 @@ async def jellyfin_subtitle(
     item_id: Annotated[str | None, Field(description="Media item ID.")] = None,
     subtitle_id: Annotated[str | None, Field(description="Subtitle index or ID.")] = None,
     language: Annotated[str | None, Field(description="ISO 639-1 language code (e.g. 'en', 'de').")] = None,
-    offset_ms: Annotated[int | None, Field(description="Subtitle offset in milliseconds (positive=later, negative=earlier).")] = None,
+    offset_ms: Annotated[
+        int | None, Field(description="Subtitle offset in milliseconds (positive=later, negative=earlier).")
+    ] = None,
     provider: Annotated[str | None, Field(description="Subtitle provider name (e.g. 'opensubtitles').")] = None,
 ) -> dict[str, Any]:
     """Comprehensive subtitle management for Jellyfin media items.
@@ -57,7 +59,11 @@ async def jellyfin_subtitle(
             if not item_id:
                 return {"success": False, "error": "item_id is required for download", "error_code": "MISSING_ITEM_ID"}
             if not subtitle_id:
-                return {"success": False, "error": "subtitle_id is required for download", "error_code": "MISSING_SUBTITLE_ID"}
+                return {
+                    "success": False,
+                    "error": "subtitle_id is required for download",
+                    "error_code": "MISSING_SUBTITLE_ID",
+                }
             jf = await get_jellyfin_service()
             result = await jf.download_subtitles(item_id, subtitle_id)
             return {
@@ -81,7 +87,11 @@ async def jellyfin_subtitle(
             if not item_id:
                 return {"success": False, "error": "item_id is required for delete", "error_code": "MISSING_ITEM_ID"}
             if not subtitle_id:
-                return {"success": False, "error": "subtitle_id is required for delete", "error_code": "MISSING_SUBTITLE_ID"}
+                return {
+                    "success": False,
+                    "error": "subtitle_id is required for delete",
+                    "error_code": "MISSING_SUBTITLE_ID",
+                }
             jf = await get_jellyfin_service()
             result = await jf._delete(f"/Videos/{item_id}/Subtitles/{subtitle_id}")
             return {

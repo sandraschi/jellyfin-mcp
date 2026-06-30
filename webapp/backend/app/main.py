@@ -1,7 +1,8 @@
 """FastAPI application for jellyfin-mcp webapp."""
+
+import asyncio
 import logging
 import logging.handlers
-import os
 import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -78,9 +79,8 @@ logger = logging.getLogger(__name__)
 # 2. Lazy FastMCP mount
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
-    import asyncio as _asyncio
 
-    _asyncio.create_task(_lazy_mount_mcp())
+    asyncio.create_task(_lazy_mount_mcp())
     yield
 
 
@@ -91,7 +91,6 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-import asyncio as _asyncio
 
 _mcp_loaded = False
 

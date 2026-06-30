@@ -22,14 +22,21 @@ class PluginService:
             data = await self._jf.get_plugin_manifest()
             plugins = []
             for entry in data if isinstance(data, list) else data.get("plugins", []):
-                plugins.append({
-                    "id": entry.get("guid", entry.get("id", "")),
-                    "name": entry.get("name", entry.get("id", "Unknown")),
-                    "description": entry.get("description", entry.get("overview", "")),
-                    "category": entry.get("category", entry.get("categoryName", "general")),
-                    "version": entry.get("version", entry.get("versions", [{}])[0].get("version", "unknown") if entry.get("versions") else "unknown"),
-                    "url": entry.get("sourceUrl", entry.get("sourceUrl", "")),
-                })
+                plugins.append(
+                    {
+                        "id": entry.get("guid", entry.get("id", "")),
+                        "name": entry.get("name", entry.get("id", "Unknown")),
+                        "description": entry.get("description", entry.get("overview", "")),
+                        "category": entry.get("category", entry.get("categoryName", "general")),
+                        "version": entry.get(
+                            "version",
+                            entry.get("versions", [{}])[0].get("version", "unknown")
+                            if entry.get("versions")
+                            else "unknown",
+                        ),
+                        "url": entry.get("sourceUrl", entry.get("sourceUrl", "")),
+                    }
+                )
             self._catalog_cache = plugins
             return plugins
         except Exception as e:

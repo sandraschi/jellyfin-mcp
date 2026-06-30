@@ -92,7 +92,17 @@ class JellyfinService(BaseService):
     # --- Libraries ---
     async def get_libraries(self) -> list[dict]:
         resp = await self._get("/Library/VirtualFolders")
-        return resp if isinstance(resp, list) else resp.get("Items", resp)
+        libs = resp if isinstance(resp, list) else resp.get("Items", resp)
+        # Enrich with item counts via Items query
+        for lib in libs:
+            item_id = lib.get("ItemId")
+            if item_id:
+                try:
+                    count_resp = await self._get("/Items", ParentId=item_id, Limit=0, Recursive="true")
+                    lib["ItemCount"] = count_resp.get("TotalRecordCount", 0)
+                except Exception:
+                    lib["ItemCount"] = 0
+        return libs
 
     async def get_library(self, library_id: str) -> dict:
         libs = await self.get_libraries()
@@ -116,7 +126,10 @@ class JellyfinService(BaseService):
         return await self._delete("/Library/VirtualFolders", id=library_id)
 
     async def refresh_library(self, library_id: str) -> dict:
-        return await self._post(f"/Items/{library_id}/Refresh", json_body={"Recursive": True, "ImageRefreshMode": "FullRefresh", "MetadataRefreshMode": "FullRefresh"})
+        return await self._post(
+            f"/Items/{library_id}/Refresh",
+            json_body={"Recursive": True, "ImageRefreshMode": "FullRefresh", "MetadataRefreshMode": "FullRefresh"},
+        )
 
     # --- Items (Media) ---
     async def get_items(
@@ -224,9 +237,7 @@ class JellyfinService(BaseService):
         )
 
     async def send_command(self, session_id: str, command: str, **kwargs) -> dict:
-        return await self._post(
-            f"/Sessions/{session_id}/Command/{command}", json_body=kwargs or {}
-        )
+        return await self._post(f"/Sessions/{session_id}/Command/{command}", json_body=kwargs or {})
 
     async def stop_session(self, session_id: str) -> dict:
         return await self._post(f"/Sessions/{session_id}/Command/Stop")

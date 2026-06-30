@@ -13,15 +13,29 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_playlist(
     operation: Annotated[
         Literal[
-            "list", "get", "create", "update", "delete",
-            "add_items", "remove_items", "reorder", "share",
+            "list",
+            "get",
+            "create",
+            "update",
+            "delete",
+            "add_items",
+            "remove_items",
+            "reorder",
+            "share",
         ],
         Field(description="Playlist operation to perform."),
     ],
-    playlist_id: Annotated[str | None, Field(description="Playlist ID (required for get/update/delete/add_items/remove_items/reorder/share).")] = None,
+    playlist_id: Annotated[
+        str | None,
+        Field(description="Playlist ID (required for get/update/delete/add_items/remove_items/reorder/share)."),
+    ] = None,
     name: Annotated[str | None, Field(description="Playlist name (required for create, optional for update).")] = None,
-    item_ids: Annotated[list[str] | None, Field(description="List of item IDs (required for create/add_items/remove_items).")] = None,
-    user_id: Annotated[str | None, Field(description="User ID of the playlist owner (required for create and most operations).")] = None,
+    item_ids: Annotated[
+        list[str] | None, Field(description="List of item IDs (required for create/add_items/remove_items).")
+    ] = None,
+    user_id: Annotated[
+        str | None, Field(description="User ID of the playlist owner (required for create and most operations).")
+    ] = None,
     items: Annotated[list[str] | None, Field(description="Reordered list of item IDs for reorder operation.")] = None,
 ) -> ToolResult:
     """Manage Jellyfin playlists: list, get, create, update, delete, add/remove items, reorder, and share.

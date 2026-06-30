@@ -16,7 +16,10 @@ async def jellyfin_search(
         Field(description="Search operation to perform."),
     ],
     query: Annotated[str | None, Field(description="Search term (required for search/advanced/suggest).")] = None,
-    types: Annotated[str | None, Field(description="Comma-separated item types for advanced search (Movie,Series,MusicArtist,Audio,Photo).")] = None,
+    types: Annotated[
+        str | None,
+        Field(description="Comma-separated item types for advanced search (Movie,Series,MusicArtist,Audio,Photo)."),
+    ] = None,
     limit: Annotated[int, Field(description="Max results.", ge=1, le=200)] = 50,
     filters: Annotated[str | None, Field(description="Comma-separated Jellyfin filters (e.g. 'IsUnplayed').")] = None,
     person: Annotated[str | None, Field(description="Person name filter (for people search).")] = None,
@@ -46,8 +49,11 @@ async def jellyfin_search(
             if not query:
                 raise ValueError("query is required for 'advanced' operation.")
             kwargs = {
-                "search_term": query, "limit": limit, "recursive": True,
-                "sort_by": "SortName", "sort_order": "Ascending",
+                "search_term": query,
+                "limit": limit,
+                "recursive": True,
+                "sort_by": "SortName",
+                "sort_order": "Ascending",
             }
             if types:
                 kwargs["include_item_types"] = types
@@ -73,7 +79,10 @@ async def jellyfin_search(
             item_types = types or "Movie,Series,MusicArtist,Audio"
             data = await jf.search(query=query, include_item_types=item_types, limit=min(limit, 20))
         elif operation == "saved":
-            data = {"message": "Saved searches are not a built-in Jellyfin feature.", "hint": "Use jellyfin_playlist or jellyfin_collections for saved content."}
+            data = {
+                "message": "Saved searches are not a built-in Jellyfin feature.",
+                "hint": "Use jellyfin_playlist or jellyfin_collections for saved content.",
+            }
         else:
             raise ValueError(f"Unknown operation: {operation}")
 

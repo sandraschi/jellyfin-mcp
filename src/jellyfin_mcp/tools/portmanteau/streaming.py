@@ -13,9 +13,14 @@ from ...services.registry import get_jellyfin_service
 async def jellyfin_streaming(
     operation: Annotated[
         Literal[
-            "sessions", "clients", "transcode",
-            "bandwidth", "direct_play", "remote",
-            "lan", "kill",
+            "sessions",
+            "clients",
+            "transcode",
+            "bandwidth",
+            "direct_play",
+            "remote",
+            "lan",
+            "kill",
         ],
         Field(description="Streaming operation to perform."),
     ],
@@ -40,84 +45,100 @@ async def jellyfin_streaming(
             sessions = await jf.get_sessions()
             clients = []
             seen = set()
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 client = s.get("Client", "") or s.get("DeviceName", "")
                 device_id = s.get("DeviceId", "")
                 if device_id and device_id not in seen:
                     seen.add(device_id)
-                    clients.append({
-                        "device_id": device_id,
-                        "client": client,
-                        "device_name": s.get("DeviceName", ""),
-                        "app_version": s.get("ApplicationVersion", ""),
-                        "user_name": s.get("UserName", ""),
-                        "play_state": s.get("PlayState", {}).get("PositionTicks", 0) > 0,
-                    })
+                    clients.append(
+                        {
+                            "device_id": device_id,
+                            "client": client,
+                            "device_name": s.get("DeviceName", ""),
+                            "app_version": s.get("ApplicationVersion", ""),
+                            "user_name": s.get("UserName", ""),
+                            "play_state": s.get("PlayState", {}).get("PositionTicks", 0) > 0,
+                        }
+                    )
             data = clients
         elif operation == "transcode":
             sessions = await jf.get_sessions()
             transcoding = []
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 if s.get("TranscodingInfo"):
-                    transcoding.append({
-                        "session_id": s.get("Id"),
-                        "user": s.get("UserName", ""),
-                        "item": s.get("NowPlayingItem", {}).get("Name", ""),
-                        "transcode_info": s.get("TranscodingInfo"),
-                        "play_state": s.get("PlayState", {}),
-                    })
+                    transcoding.append(
+                        {
+                            "session_id": s.get("Id"),
+                            "user": s.get("UserName", ""),
+                            "item": s.get("NowPlayingItem", {}).get("Name", ""),
+                            "transcode_info": s.get("TranscodingInfo"),
+                            "play_state": s.get("PlayState", {}),
+                        }
+                    )
             data = transcoding
         elif operation == "bandwidth":
             sessions = await jf.get_sessions()
             total_bitrate = 0
             details = []
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 info = s.get("TranscodingInfo", {}) or {}
                 bitrate = info.get("Bitrate", 0)
                 total_bitrate += bitrate
                 if bitrate or s.get("PlayState", {}).get("IsPaused") is False:
-                    details.append({
-                        "session_id": s.get("Id"),
-                        "user": s.get("UserName", ""),
-                        "bitrate_bps": bitrate,
-                        "bitrate_mbps": round(bitrate / 1_000_000, 2) if bitrate else 0,
-                    })
-            data = {"total_bitrate_bps": total_bitrate, "total_bitrate_mbps": round(total_bitrate / 1_000_000, 2), "sessions": details}
+                    details.append(
+                        {
+                            "session_id": s.get("Id"),
+                            "user": s.get("UserName", ""),
+                            "bitrate_bps": bitrate,
+                            "bitrate_mbps": round(bitrate / 1_000_000, 2) if bitrate else 0,
+                        }
+                    )
+            data = {
+                "total_bitrate_bps": total_bitrate,
+                "total_bitrate_mbps": round(total_bitrate / 1_000_000, 2),
+                "sessions": details,
+            }
         elif operation == "direct_play":
             sessions = await jf.get_sessions()
             direct = []
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 info = s.get("TranscodingInfo", {}) or {}
                 if s.get("PlayState", {}).get("PlayMethod") == "DirectPlay":
-                    direct.append({
-                        "session_id": s.get("Id"),
-                        "user": s.get("UserName", ""),
-                        "item": s.get("NowPlayingItem", {}).get("Name", ""),
-                        "media_type": s.get("NowPlayingItem", {}).get("Type", ""),
-                    })
+                    direct.append(
+                        {
+                            "session_id": s.get("Id"),
+                            "user": s.get("UserName", ""),
+                            "item": s.get("NowPlayingItem", {}).get("Name", ""),
+                            "media_type": s.get("NowPlayingItem", {}).get("Type", ""),
+                        }
+                    )
             data = {"direct_play_count": len(direct), "sessions": direct}
         elif operation == "remote":
             sessions = await jf.get_sessions()
             remote = []
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 if s.get("RemoteEndPoint"):
-                    remote.append({
-                        "session_id": s.get("Id"),
-                        "user": s.get("UserName", ""),
-                        "remote_endpoint": s.get("RemoteEndPoint", ""),
-                        "client": s.get("Client", ""),
-                    })
+                    remote.append(
+                        {
+                            "session_id": s.get("Id"),
+                            "user": s.get("UserName", ""),
+                            "remote_endpoint": s.get("RemoteEndPoint", ""),
+                            "client": s.get("Client", ""),
+                        }
+                    )
             data = {"remote_count": len(remote), "sessions": remote}
         elif operation == "lan":
             sessions = await jf.get_sessions()
             lan = []
-            for s in (sessions if isinstance(sessions, list) else []):
+            for s in sessions if isinstance(sessions, list) else []:
                 if not s.get("RemoteEndPoint"):
-                    lan.append({
-                        "session_id": s.get("Id"),
-                        "user": s.get("UserName", ""),
-                        "device": s.get("DeviceName", ""),
-                    })
+                    lan.append(
+                        {
+                            "session_id": s.get("Id"),
+                            "user": s.get("UserName", ""),
+                            "device": s.get("DeviceName", ""),
+                        }
+                    )
             data = {"lan_count": len(lan), "sessions": lan}
         elif operation == "kill":
             if not session_id:

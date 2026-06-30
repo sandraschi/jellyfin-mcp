@@ -78,7 +78,11 @@ async def jellyfin_livetv(
 
         if operation == "schedule":
             if not program_id:
-                return {"success": False, "error": "program_id is required for schedule", "error_code": "MISSING_PROGRAM_ID"}
+                return {
+                    "success": False,
+                    "error": "program_id is required for schedule",
+                    "error_code": "MISSING_PROGRAM_ID",
+                }
             result = await jf.create_recording(program_id)
             return {
                 "success": True,
@@ -148,7 +152,9 @@ async def jellyfin_livetv(
             "success": False,
             "error": f"Unknown operation: {operation}",
             "error_code": "INVALID_OPERATION",
-            "suggestions": ["Valid operations: channels, guide, recordings, schedule, tuners, epg_refresh, delete_recording, manage"],
+            "suggestions": [
+                "Valid operations: channels, guide, recordings, schedule, tuners, epg_refresh, delete_recording, manage"
+            ],
         }
 
     except Exception as e:

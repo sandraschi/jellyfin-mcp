@@ -15,9 +15,15 @@ async def jellyfin_plugin(
         Literal["catalog", "list", "install", "uninstall", "enable", "disable", "configure", "update"],
         Field(description="Plugin operation to perform."),
     ],
-    plugin_id: Annotated[str | None, Field(description="Plugin ID (required for install/uninstall/enable/disable/configure/update).")] = None,
-    version: Annotated[str | None, Field(description="Plugin version for install/update operations. Default: 'latest'.")] = None,
-    config: Annotated[dict[str, Any] | None, Field(description="Plugin configuration dict (required for configure).")] = None,
+    plugin_id: Annotated[
+        str | None, Field(description="Plugin ID (required for install/uninstall/enable/disable/configure/update).")
+    ] = None,
+    version: Annotated[
+        str | None, Field(description="Plugin version for install/update operations. Default: 'latest'.")
+    ] = None,
+    config: Annotated[
+        dict[str, Any] | None, Field(description="Plugin configuration dict (required for configure).")
+    ] = None,
 ) -> ToolResult:
     """Manage Jellyfin plugins: browse catalog, list installed, install, uninstall, enable, disable, configure, and update.
 

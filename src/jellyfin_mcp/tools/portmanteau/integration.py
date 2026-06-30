@@ -39,7 +39,11 @@ async def jellyfin_integration(
     try:
         if operation == "export_plex":
             if not source_path:
-                return {"success": False, "error": "source_path is required for export_plex", "error_code": "MISSING_SOURCE_PATH"}
+                return {
+                    "success": False,
+                    "error": "source_path is required for export_plex",
+                    "error_code": "MISSING_SOURCE_PATH",
+                }
             return {
                 "success": True,
                 "operation": "export_plex",
@@ -49,7 +53,11 @@ async def jellyfin_integration(
 
         if operation == "import_plex":
             if not source_path:
-                return {"success": False, "error": "source_path is required for import_plex", "error_code": "MISSING_SOURCE_PATH"}
+                return {
+                    "success": False,
+                    "error": "source_path is required for import_plex",
+                    "error_code": "MISSING_SOURCE_PATH",
+                }
             return {
                 "success": True,
                 "operation": "import_plex",
@@ -75,7 +83,11 @@ async def jellyfin_integration(
 
         if operation == "restore":
             if not source_path:
-                return {"success": False, "error": "source_path is required for restore", "error_code": "MISSING_SOURCE_PATH"}
+                return {
+                    "success": False,
+                    "error": "source_path is required for restore",
+                    "error_code": "MISSING_SOURCE_PATH",
+                }
             return {
                 "success": True,
                 "operation": "restore",

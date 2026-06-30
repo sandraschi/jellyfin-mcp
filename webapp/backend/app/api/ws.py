@@ -1,4 +1,5 @@
 """WebSocket proxy — forwards Jellyfin WebSocket events to browser clients."""
+
 import asyncio
 import json
 import logging
@@ -75,7 +76,7 @@ async def websocket_proxy(ws: WebSocket):
 
     try:
         while True:
-            data = await ws.receive_text()
+            await ws.receive_text()
             # Forward any browser commands to Jellyfin if needed
             # For now, just keep the connection alive
     except WebSocketDisconnect:

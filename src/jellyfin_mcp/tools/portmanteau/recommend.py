@@ -43,7 +43,11 @@ async def jellyfin_recommend(
     try:
         if operation == "similar":
             if not item_id:
-                return {"success": False, "error": "item_id is required for similar recommendations", "error_code": "MISSING_ITEM_ID"}
+                return {
+                    "success": False,
+                    "error": "item_id is required for similar recommendations",
+                    "error_code": "MISSING_ITEM_ID",
+                }
             jf = await get_jellyfin_service()
             raw = await jf.get_similar(item_id, limit=limit or 10)
             items = raw.get("Items", raw) if isinstance(raw, dict) else raw
@@ -58,7 +62,11 @@ async def jellyfin_recommend(
 
         if operation == "genre":
             if not genre:
-                return {"success": False, "error": "genre is required for genre recommendations", "error_code": "MISSING_GENRE"}
+                return {
+                    "success": False,
+                    "error": "genre is required for genre recommendations",
+                    "error_code": "MISSING_GENRE",
+                }
             jf = await get_jellyfin_service()
             # Pass genre as server-side filter; Jellyfin accepts Genres as a comma-separated param
             raw = await jf.get_items(limit=limit or 10, recursive=True, genres=genre)

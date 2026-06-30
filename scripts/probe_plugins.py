@@ -1,4 +1,5 @@
 """Probe plugin catalog endpoints."""
+
 import asyncio
 
 import httpx

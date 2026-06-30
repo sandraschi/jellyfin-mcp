@@ -8,18 +8,22 @@
     "beforeDevCommand": "npm --prefix ../webapp/frontend run dev"
   },
   "app": {
-    "windows": [{
-      "title": "Jellyfin MCP — Jellyfin++",
-      "width": 1280,
-      "height": 800,
-      "minWidth": 900,
-      "minHeight": 600
-    }],
-    "security": { "csp": null }
+    "windows": [
+      {
+        "title": "Jellyfin MCP — Jellyfin++",
+        "label": "main",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 900,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
@@ -27,11 +31,34 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["binaries/jellyfin-mcp-backend"]
+    "resources": [
+      "resources/jellyfin-mcp-backend.exe",
+            "resources/.env"
+    ],
+    "targets": [
+      "nsis"
+    ],
+    "windows": {
+      "webviewInstallMode": {
+        "type": "skip"
+      },
+      "nsis": {
+        "installMode": "currentUser",
+"installerHooks": "./windows/hooks.nsh"
+      }
+    }
   },
   "plugins": {
-    "shell": { "open": true },
-    "fs": { "requireLiteralLeadingDot": false },
-    "process": { "all": true }
+    "shell": {
+      "open": true
+    },
+    "fs": {
+      "requireLiteralLeadingDot": false
+    },
+    "process": {
+      "all": true
+    }
   }
 }
+
+

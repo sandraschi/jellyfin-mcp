@@ -1,7 +1,17 @@
 """Jellyfin HTTP client helper for webapp API routes."""
+
 import os
+from pathlib import Path
 
 import httpx
+from dotenv import load_dotenv
+
+# Try to load .env from repo root
+_env_path = Path(__file__).parent.parent.parent.parent / ".env"
+if _env_path.exists():
+    load_dotenv(dotenv_path=_env_path)
+else:
+    load_dotenv()
 
 
 def _get_jellyfin_config():

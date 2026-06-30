@@ -1,4 +1,5 @@
 """Playback/sessions API endpoints."""
+
 from fastapi import APIRouter, HTTPException, Query
 
 from ..jel import get_client

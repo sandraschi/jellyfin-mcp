@@ -15,9 +15,15 @@ async def jellyfin_collections(
         Literal["list", "get", "create", "update", "delete", "add_items", "remove_items"],
         Field(description="Collections operation to perform."),
     ],
-    collection_id: Annotated[str | None, Field(description="Collection ID (required for get/update/delete/add_items/remove_items).")] = None,
-    name: Annotated[str | None, Field(description="Collection name (required for create, optional for update).")] = None,
-    item_ids: Annotated[list[str] | None, Field(description="List of item IDs (required for create/add_items/remove_items).")] = None,
+    collection_id: Annotated[
+        str | None, Field(description="Collection ID (required for get/update/delete/add_items/remove_items).")
+    ] = None,
+    name: Annotated[
+        str | None, Field(description="Collection name (required for create, optional for update).")
+    ] = None,
+    item_ids: Annotated[
+        list[str] | None, Field(description="List of item IDs (required for create/add_items/remove_items).")
+    ] = None,
     user_id: Annotated[str | None, Field(description="User ID for user-scoped collection operations.")] = None,
 ) -> ToolResult:
     """Manage Jellyfin collections: list, get, create, update, delete, and add/remove items.

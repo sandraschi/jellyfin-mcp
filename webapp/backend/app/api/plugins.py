@@ -1,4 +1,5 @@
 """Plugin management API endpoints."""
+
 from fastapi import APIRouter, HTTPException
 
 from ..jel import get_client

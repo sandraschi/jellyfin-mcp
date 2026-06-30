@@ -1,4 +1,5 @@
 """Library API endpoints."""
+
 from fastapi import APIRouter, HTTPException
 
 from ..jel import get_client
@@ -35,6 +36,17 @@ async def list_libraries():
             resp.raise_for_status()
             data = resp.json()
             items = data if isinstance(data, list) else data.get("Items", data)
+
+            # Enrich with actual item counts via Items query
+            for lib in items:
+                lib_id = lib.get("ItemId")
+                if lib_id:
+                    try:
+                        cr = await client.get("/Items", params={"ParentId": lib_id, "Limit": 0, "Recursive": "true"})
+                        lib["ItemCount"] = cr.json().get("TotalRecordCount", 0)
+                    except Exception:
+                        lib["ItemCount"] = 0
+
             normalized = [_normalize_library(lib) for lib in items]
             return {"success": True, "data": normalized}
     except Exception as e:
