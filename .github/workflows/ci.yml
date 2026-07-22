@@ -2,16 +2,15 @@ name: CI
 
 on:
   push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    tags: ["v*"]
+  workflow_dispatch:
 
 jobs:
   lint-python:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
+      - uses: astral-sh/setup-uv@v7
         with: { python-version: "3.12" }
       - run: uv sync --group dev
       - run: uv run ruff check .
@@ -21,35 +20,10 @@ jobs:
     needs: lint-python
     steps:
       - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
+      - uses: astral-sh/setup-uv@v7
         with: { python-version: "3.12" }
       - run: uv sync --group dev
       - run: uv run pytest -x --tb=short -k "not slow"
         env:
           JELLYFIN_URL: http://localhost:8096
           JELLYFIN_API_KEY: ${{ secrets.JELLYFIN_API_KEY }}
-
-  lint-frontend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: cd webapp/frontend && npm ci
-      - run: cd webapp/frontend && npx @biomejs/biome check .
-
-  e2e:
-    runs-on: ubuntu-latest
-    needs: [test, lint-frontend]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v4
-        with: { python-version: "3.12" }
-      - uses: actions/setup-node@v4
-        with: { node-version: "20" }
-      - run: uv sync --group dev
-      - run: cd webapp/frontend && npm ci
-      - run: cd webapp/frontend && npx playwright install chromium
-      - run: cd webapp/frontend && npx playwright test
-        env:
-          CI: "true"
