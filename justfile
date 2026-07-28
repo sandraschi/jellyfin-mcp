@@ -1,4 +1,4 @@
-set windows-shell := ["pwsh.exe", "-NoLogo", "-Command"]
+set windows-shell := ["powershell.exe", "-NoProfile", "-Command"]
 import 'scripts/just/fleet.just'
 
 # jellyfin-mcp Project Management
@@ -11,9 +11,13 @@ version:
 
 # --- Basic Workflow ---
 
-install:
-    uv sync
-    pre-commit install
+bootstrap:
+    uv sync --group dev
+    uv run pre-commit install
+    Set-Location webapp/frontend; npm ci; if ($LASTEXITCODE -ne 0) { npm install }
+    Write-Host "Pre-commit hooks installed." -ForegroundColor Green
+
+install: bootstrap
 
 start:
     uv run jellyfin-mcp
@@ -89,7 +93,7 @@ build-native-debug:
     npx @tauri-apps/cli build --debug
 
 tauri-sidecar:
-    pwsh -NoLogo -File '{{justfile_directory()}}\native\build-sidecar.ps1'
+    powershell.exe -NoProfile -File '{{justfile_directory()}}\native\build-sidecar.ps1'
 
 tauri-build:
     Set-Location '{{justfile_directory()}}\native'
@@ -101,10 +105,6 @@ tauri-dev:
     $env:Path = "$env:USERPROFILE\.cargo\bin;$env:Path"
     npm install
     npx @tauri-apps/cli dev
-
-# Run CUA smoke test against installed NSIS app
-cua-nsis-test:
-    C:\Windows\py.exe scripts/cua-smoke.py
 
 clean:
     @powershell -Command "Remove-Item -Recurse -Force .pytest_cache, .ruff_cache, dist, build, htmlcov -ErrorAction SilentlyContinue"

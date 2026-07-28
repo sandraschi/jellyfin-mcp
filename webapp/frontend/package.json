@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start -p 10935",
     "lint": "biome check .",
+    "biome:ci": "biome ci .",
     "format": "biome format --write .",
     "test:e2e": "playwright test"
   },
