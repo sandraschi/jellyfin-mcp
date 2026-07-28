@@ -86,6 +86,33 @@ def run_server(mcp_app, args: argparse.Namespace | None = None, server_name: str
 
 
 async def run_server_async(mcp_app, args: argparse.Namespace | None = None, server_name: str = "jellyfin-mcp") -> None:
+    proxy_url = os.getenv("JELLYFIN_MCP_API_URL", "http://127.0.0.1:10934/mcp")
+    try:
+        import httpx
+
+        r = httpx.post(
+            proxy_url,
+            json={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "initialize",
+                "params": {
+                    "protocolVersion": "2025-11-25",
+                    "capabilities": {},
+                    "clientInfo": {"name": "probe", "version": "1"},
+                },
+            },
+            headers={"Accept": "application/json, text/event-stream"},
+            timeout=0.5,
+        )
+        if r.status_code == 200:
+            from fastmcp.server import create_proxy
+
+            proxy = create_proxy(proxy_url, name=server_name)
+            await proxy.run_stdio_async(show_banner=False)
+            return
+    except Exception:
+        pass
     if args is None:
         parser = create_argument_parser(server_name)
         args = parser.parse_args()
