@@ -29,33 +29,33 @@ webapp:
 
 lint:
     @echo "--- Checking Python (Ruff) ---"
-    ruff check .
+    uv run ruff check .
     @echo "--- Checking JS/TS (Biome) ---"
     cd webapp/frontend && npx @biomejs/biome check .
 
 fix:
-    ruff check . --fix
-    ruff format .
+    uv run ruff check . --fix
+    uv run ruff format .
     cd webapp/frontend && npx @biomejs/biome check --write .
 
 fmt:
-    ruff format .
+    uv run ruff format .
     cd webapp/frontend && npx @biomejs/biome format --write .
 
 test:
-    @pytest tests/ -v -m "not slow"
+    @uv run pytest tests/ -v -m "not slow"
 
 test-all:
-    @pytest tests/ -v
+    @uv run pytest tests/ -v
 
 test-unit:
-    @pytest tests/unit -v
+    @uv run pytest tests/unit -v
 
 test-integration:
-    @pytest tests/integration -v -m "integration and not slow"
+    @uv run pytest tests/integration -v -m "integration and not slow"
 
 test-slow:
-    @pytest tests/integration/test_rag.py -v -m slow
+    @uv run pytest tests/integration/test_rag.py -v -m slow
 
 e2e:
     Set-Location webapp/frontend
@@ -109,3 +109,5 @@ tauri-dev:
 clean:
     @powershell -Command "Remove-Item -Recurse -Force .pytest_cache, .ruff_cache, dist, build, htmlcov -ErrorAction SilentlyContinue"
     @powershell -Command "Get-ChildItem -Path . -Recurse -Directory -Filter __pycache__ -ErrorAction SilentlyContinue | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue"
+
+# Bootstrap: install dev deps + pre-commit hook
