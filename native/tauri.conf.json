@@ -33,7 +33,7 @@
     ],
     "resources": [
       "resources/jellyfin-mcp-backend.exe",
-            "resources/.env"
+            "resources/.env.example"
     ],
     "targets": [
       "nsis"
@@ -60,5 +60,6 @@
     }
   }
 }
+
 
 
