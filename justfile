@@ -31,16 +31,16 @@ lint:
     @echo "--- Checking Python (Ruff) ---"
     uv run ruff check .
     @echo "--- Checking JS/TS (Biome) ---"
-    cd webapp/frontend && npx @biomejs/biome check .
+    cd webapp/frontend; npx @biomejs/biome check .
 
 fix:
     uv run ruff check . --fix
     uv run ruff format .
-    cd webapp/frontend && npx @biomejs/biome check --write .
+    cd webapp/frontend; npx @biomejs/biome check --write .
 
 fmt:
     uv run ruff format .
-    cd webapp/frontend && npx @biomejs/biome format --write .
+    cd webapp/frontend; npx @biomejs/biome format --write .
 
 test:
     @uv run pytest tests/ -v -m "not slow"
@@ -58,21 +58,16 @@ test-slow:
     @uv run pytest tests/integration/test_rag.py -v -m slow
 
 e2e:
-    Set-Location webapp/frontend
-    npx playwright install chromium
-    npx playwright test
+    Set-Location webapp/frontend; npx playwright install chromium; npx playwright test
 
 e2e-ui:
-    Set-Location webapp/frontend
-    npx playwright test --ui
+    Set-Location webapp/frontend; npx playwright test --ui
 
 e2e-headed:
-    Set-Location webapp/frontend
-    npx playwright test --headed
+    Set-Location webapp/frontend; npx playwright test --headed
 
 e2e-serve:
-    Set-Location webapp/frontend
-    npx playwright test -g "@noop"
+    Set-Location webapp/frontend; npx playwright test -g "@noop"
 
 ci: lint test
 
