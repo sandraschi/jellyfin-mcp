@@ -14,6 +14,15 @@
 - CORS: llow_origins=["*"] → explicit origins list for Tauri webview compatibility
 # Changelog — jellyfin-mcp
 
+## Unreleased (2026-10-10 assfix)
+- Security: transport.py CORS wildcard replaced with explicit origins + unconditional regex (was allow_origins ["*"]).
+- Packaging: mcpb/manifest.json ${PWD} replaced with ${__dirname} (Desktop does not expand PWD).
+- Lint: removed S110/S112 from ruff ignore; fixed 4 silent except-pass into logger.debug (rag x2, transport probe, ws listener).
+- Launcher: start.ps1 port-zombie clear + TCP readiness poll + WorkingDirectory + BackendOnly support.
+- Session ctx: .cursorrules/.windsurfrules/.claude-plugin/hooks/copilot-instructions added.
+- Docs: docs/ONBOARDING.md (Jellyfin URL+key flow). Reports: docs/assess-reports/2026-10-10.md.
+- Hygiene: .gitignore covers reports/*.mcpb/*.bak; old justfile/scripts .bak staged for removal.
+
 ## 0.1.1 (2026-05-22)
 
 - Complete Tauri 2.0 stack: PyInstaller one-file sidecar, build-sidecar.ps1, icon generator
@@ -23,4 +32,3 @@
 ## 0.1.0
 
 - Initial release: 22 portmanteau MCP tools, Next.js webapp, WebSocket playback dashboard
-

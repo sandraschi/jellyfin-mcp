@@ -1,4 +1,4 @@
-"""RAG service — LanceDB semantic search over Jellyfin metadata.
+"""RAG service - LanceDB semantic search over Jellyfin metadata.
 
 Dependencies (lancedb, sentence-transformers) are lazy-loaded at first use.
 If they are not installed, all RAG operations raise ImportError with install instructions.
@@ -38,7 +38,7 @@ class RAGService:
             try:
                 self._table = await self._run_in_executor(lambda: self._db.open_table("metadata"))
             except Exception:
-                pass  # Table doesn't exist yet — will be created on first sync
+                self._logger.debug("RAG metadata table absent - will create on first sync")
 
     async def _run_in_executor(self, func, *args):
         import asyncio
@@ -87,7 +87,7 @@ class RAGService:
         await self.initialize()
 
         if not self._table:
-            self._logger.warning("No RAG table — run sync first")
+            self._logger.warning("No RAG table - run sync first")
             return []
 
         query_embedding = await self._run_in_executor(self._model.encode, query)
@@ -125,6 +125,6 @@ class RAGService:
             try:
                 await self._run_in_executor(lambda: self._db.drop_table("metadata"))
             except Exception:
-                pass  # Already absent
+                self._logger.debug("RAG metadata table already absent on purge")
         self._table = None
         return {"purged": True, "db_path": self._db_path}

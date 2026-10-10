@@ -50,7 +50,7 @@ class WebSocketService:
                         try:
                             await listener(message_type, data)
                         except Exception:
-                            pass
+                            self._logger.debug("WS listener failed, continuing")
                 elif msg.type == aiohttp.WSMsgType.CLOSED or msg.type == aiohttp.WSMsgType.ERROR:
                     break
             except TimeoutError:
