@@ -78,6 +78,7 @@ from fastmcp.tools import ToolResult
 from pydantic import Field
 from ...app import mcp
 
+
 @mcp.tool(version="1.0.0", annotations={"readOnlyHint": True})
 async def jellyfin_yourtool(
     operation: Annotated[Literal["op1", "op2"], Field(description="...")],

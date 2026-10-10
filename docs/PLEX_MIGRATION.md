@@ -97,20 +97,11 @@ Use jellyfin-mcp or Jellyfin web UI. Example via MCP:
 
 ```python
 # Via jellyfin-mcp
-await jellyfin_library(operation="create",
-    name="Movies",
-    library_type="movie",
-    path="/mnt/media/movies")
+await jellyfin_library(operation="create", name="Movies", library_type="movie", path="/mnt/media/movies")
 
-await jellyfin_library(operation="create",
-    name="TV Shows",
-    library_type="show",
-    path="/mnt/media/tv")
+await jellyfin_library(operation="create", name="TV Shows", library_type="show", path="/mnt/media/tv")
 
-await jellyfin_library(operation="create",
-    name="Music",
-    library_type="music",
-    path="/mnt/media/music")
+await jellyfin_library(operation="create", name="Music", library_type="music", path="/mnt/media/music")
 ```
 
 Jellyfin starts scanning immediately. This can take hours for large libraries. Monitor:
@@ -129,9 +120,7 @@ Watch history is the most valuable data to migrate. Three approaches:
 watch_data = await plex_user(operation="export_watchstate")
 
 # Import to Jellyfin
-await jellyfin_integration(operation="sync_watchstate",
-    source="plex",
-    data=watch_data)
+await jellyfin_integration(operation="sync_watchstate", source="plex", data=watch_data)
 ```
 
 **Option B: Via Trakt.tv (Manual)**
@@ -148,8 +137,7 @@ For small libraries (< 200 items), just re-mark as watched in Jellyfin:
 
 ```python
 # Mark individual items watched via MCP
-await jellyfin_media(operation="update", item_id="abc123",
-    metadata={"UserData": {"Played": True}})
+await jellyfin_media(operation="update", item_id="abc123", metadata={"UserData": {"Played": True}})
 ```
 
 ### Phase 6: Migrate Collections & Playlists
@@ -159,9 +147,7 @@ await jellyfin_media(operation="update", item_id="abc123",
 ```python
 # Recreate collection
 await jellyfin_collections(operation="create", name="Marvel Cinematic Universe")
-await jellyfin_collections(operation="add_items",
-    collection_id="coll1",
-    item_ids=["ironman", "hulk", "thor", ...])
+await jellyfin_collections(operation="add_items", collection_id="coll1", item_ids=["ironman", "hulk", "thor", ...])
 ```
 
 **Playlists:** Manual recreation or via MCP export/import. Note: playlist item matching relies on media titles — if titles differ between Plex and Jellyfin metadata, manual correction needed.
@@ -174,11 +160,15 @@ await jellyfin_user(operation="create", name="Family")
 await jellyfin_user(operation="create", name="Kids")
 
 # Set permissions
-await jellyfin_user(operation="policy", user_id="u1", policy={
-    "IsAdministrator": False,
-    "EnableMediaPlayback": True,
-    "EnableLiveTvAccess": True,
-})
+await jellyfin_user(
+    operation="policy",
+    user_id="u1",
+    policy={
+        "IsAdministrator": False,
+        "EnableMediaPlayback": True,
+        "EnableLiveTvAccess": True,
+    },
+)
 ```
 
 Jellyfin's user system is simpler than Plex Home:

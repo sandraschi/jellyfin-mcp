@@ -127,5 +127,7 @@ await jellyfin_rag(operation="search", query="dark sci-fi with strong female lea
 3 ops: `workflow`, `natural_query`, `batch`
 
 ```python
-await jellyfin_agentic(operation="workflow", prompt="Find sci-fi movies I haven't watched, check IMDb ratings, add top 5 to playlist")
+await jellyfin_agentic(
+    operation="workflow", prompt="Find sci-fi movies I haven't watched, check IMDb ratings, add top 5 to playlist"
+)
 ```

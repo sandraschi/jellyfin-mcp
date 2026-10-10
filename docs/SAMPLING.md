@@ -21,11 +21,14 @@ Supports any OpenAI-compatible endpoint: Ollama, LM Studio, vLLM, OpenAI, Groq, 
 Multi-step agentic workflows using FastMCP `sample_step` — the LLM plans steps and executes tools:
 
 ```python
-await jellyfin_agentic(operation="workflow", prompt="""
+await jellyfin_agentic(
+    operation="workflow",
+    prompt="""
   Find all unwatched sci-fi movies from my library.
   For each, check if it has a rating above 7.0.
   Create a "Weekend Sci-Fi" playlist with the top 5.
-""")
+""",
+)
 ```
 
 ### jellyfin_agentic (natural_query)
@@ -33,8 +36,7 @@ await jellyfin_agentic(operation="workflow", prompt="""
 Single-turn natural language query — no tool execution:
 
 ```python
-await jellyfin_agentic(operation="natural_query",
-    query="What are the most popular movies in my library right now?")
+await jellyfin_agentic(operation="natural_query", query="What are the most popular movies in my library right now?")
 ```
 
 ### jellyfin_agentic (batch)
@@ -42,8 +44,7 @@ await jellyfin_agentic(operation="natural_query",
 Run a batch operation across items matching a description:
 
 ```python
-await jellyfin_agentic(operation="batch",
-    prompt="Refresh metadata for all movies released in 2023")
+await jellyfin_agentic(operation="batch", prompt="Refresh metadata for all movies released in 2023")
 ```
 
 ## Webapp Chat
