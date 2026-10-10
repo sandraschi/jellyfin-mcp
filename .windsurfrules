@@ -1,0 +1,7 @@
+# jellyfin-mcp — Windsurf rules (mirror of .cursorrules)
+Use portmanteau tools: jellyfin_library, jellyfin_media, jellyfin_search, jellyfin_playback, jellyfin_server.
+Responses are dicts with success/message. WebSocket events via jellyfin service. RAG: sync then search.
+
+## Session Context (jellyfin-mcp)
+Before starting work: call jellyfin_help(operation="discover"), check backend :10934/health.
+At end of work: run ruff check src/, pytest tests/unit -q, update docs/TOOLS.md if tools changed.
