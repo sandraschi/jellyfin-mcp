@@ -64,6 +64,14 @@ async def jellyfin_enrichment(
                     "error_code": "MISSING_TITLE",
                 }
             result = await enrichment.enrich_from_wikipedia(title=title)
+            if result and "error" in result:
+                return {
+                    "success": False,
+                    "operation": "wikipedia",
+                    "error": result["error"],
+                    "error_code": "UPSTREAM_ERROR",
+                    "data": result,
+                }
             return {
                 "success": result is not None,
                 "operation": "wikipedia",

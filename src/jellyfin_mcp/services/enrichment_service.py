@@ -4,6 +4,11 @@ import logging
 
 import httpx
 
+from .. import __version__
+
+# Wikimedia's User-Agent policy 403s generic UAs such as httpx's default python-httpx/x.y.
+USER_AGENT = f"jellyfin-mcp/{__version__} (+https://github.com/sandraschi/jellyfin-mcp)"
+
 
 class EnrichmentService:
     """Fetch external metadata to enrich Jellyfin media items."""
@@ -56,9 +61,13 @@ class EnrichmentService:
             return None
 
     async def enrich_from_wikipedia(self, title: str) -> dict | None:
-        """Fetch summary from Wikipedia."""
+        """Fetch summary from Wikipedia.
+
+        Returns the summary dict, or a dict with ``error`` (and ``status_code`` for HTTP
+        failures) so callers can surface the failure instead of an empty result.
+        """
         try:
-            async with httpx.AsyncClient(timeout=10) as client:
+            async with httpx.AsyncClient(timeout=10, headers={"User-Agent": USER_AGENT}) as client:
                 resp = await client.get(f"{self.WIKIPEDIA_BASE}/page/summary/{title.replace(' ', '_')}")
                 if resp.status_code == 200:
                     data = resp.json()
@@ -69,9 +78,15 @@ class EnrichmentService:
                         "url": data.get("content_urls", {}).get("desktop", {}).get("page"),
                         "thumbnail": data.get("thumbnail", {}).get("source"),
                     }
+                self._logger.warning("Wikipedia enrichment for %r returned HTTP %s", title, resp.status_code)
+                return {
+                    "source": "wikipedia",
+                    "error": f"Wikipedia returned HTTP {resp.status_code}",
+                    "status_code": resp.status_code,
+                }
         except Exception as e:
-            self._logger.debug("Wikipedia enrichment failed: %s", e)
-        return None
+            self._logger.warning("Wikipedia enrichment for %r failed: %s", title, e)
+            return {"source": "wikipedia", "error": f"Wikipedia request failed: {e}"}
 
     async def enrich(self, title: str, year: str | None = None, media_type: str = "movie") -> list[dict]:
         """Run all enrichment sources and return results."""
