@@ -112,7 +112,7 @@ async def run_server_async(mcp_app, args: argparse.Namespace | None = None, serv
             await proxy.run_stdio_async(show_banner=False)
             return
     except Exception:
-        pass
+        logger.debug("HTTP probe failed, falling back to CLI args")
     if args is None:
         parser = create_argument_parser(server_name)
         args = parser.parse_args()
@@ -156,7 +156,18 @@ async def run_server_async(mcp_app, args: argparse.Namespace | None = None, serv
                 middleware=[
                     Middleware(
                         CORSMiddleware,
-                        allow_origins=["*"],
+                        allow_origins=[
+                            "http://localhost:10935",
+                            "http://127.0.0.1:10935",
+                            "http://goliath:10935",
+                            "http://localhost:10934",
+                            "http://127.0.0.1:10934",
+                            "http://goliath:10934",
+                            "http://tauri.localhost",
+                            "https://tauri.localhost",
+                            "tauri://localhost",
+                        ],
+                        allow_origin_regex=r"https?://(localhost|127\.0\.0\.1|goliath|tauri\.localhost)(:\d+)?",
                         allow_credentials=True,
                         allow_methods=["*"],
                         allow_headers=["*"],
