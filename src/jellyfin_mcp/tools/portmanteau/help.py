@@ -288,11 +288,11 @@ async def jellyfin_help(
                 "message": "Quickstart guide",
                 "data": {
                     "steps": [
-                        "1. jellyfin_library(operation='list') — list libraries",
-                        "2. jellyfin_media(operation='browse', library_id='...') — browse content",
-                        "3. jellyfin_search(operation='search', query='...') — search",
-                        "4. jellyfin_rag(operation='sync') then jellyfin_rag(operation='search', query='...') — semantic search",
-                        "5. jellyfin_help(operation='discover') — all tools",
+                        "1. jellyfin_library(operation='list') - list libraries",
+                        "2. jellyfin_media(operation='browse', library_id='...') - browse content",
+                        "3. jellyfin_search(operation='search', query='...') - search",
+                        "4. jellyfin_rag(operation='sync') then jellyfin_rag(operation='search', query='...') - semantic search",
+                        "5. jellyfin_help(operation='discover') - all tools",
                     ],
                 },
             }

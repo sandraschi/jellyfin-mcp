@@ -1,5 +1,5 @@
 """
-jellyfin-mcp — FastMCP 3.2+ Server for Jellyfin Media Server.
+jellyfin-mcp - FastMCP 3.2+ Server for Jellyfin Media Server.
 """
 
 from .app import _is_stdio_mode, mcp
@@ -52,7 +52,7 @@ if not _is_stdio_mode:
 
 
 def main():
-    """Main entry point — supports STDIO, HTTP, and SSE transport."""
+    """Main entry point - supports STDIO, HTTP, and SSE transport."""
     from .transport import run_server
 
     logger.info("Starting jellyfin-mcp (FastMCP 3.2+)")

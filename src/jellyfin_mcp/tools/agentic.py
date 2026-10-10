@@ -1,4 +1,4 @@
-"""jellyfin-mcp Agentic Tool — Dynamic LLM-powered workflows via FastMCP 3.2 sampling.
+"""jellyfin-mcp Agentic Tool - Dynamic LLM-powered workflows via FastMCP 3.2 sampling.
 
 Registered programmatically via register_agentic_jellyfin_tools(mcp) in server.py.
 """
@@ -43,9 +43,9 @@ def register_agentic_jellyfin_tools(mcp):
         Uses FastMCP 3.2 sampling to execute multi-step workflows, natural language
         queries, and batch operations against the Jellyfin media server.
 
-        - workflow: Multi-step planning with Context.sample_step — the LLM plans
+        - workflow: Multi-step planning with Context.sample_step - the LLM plans
           a sequence of tool calls and executes them step by step.
-        - natural_query: Single-turn Q&A with Context.sample — ask a question
+        - natural_query: Single-turn Q&A with Context.sample - ask a question
           about your media library and get a conversational answer.
         - batch: Execute multiple independent tool calls in parallel.
 
@@ -100,7 +100,7 @@ def register_agentic_jellyfin_tools(mcp):
                     return {
                         "success": True,
                         "operation": "natural_query",
-                        "message": "Sampling not configured — returning prompt analysis only",
+                        "message": "Sampling not configured - returning prompt analysis only",
                         "data": {"prompt": prompt, "analysis": "sampling_disabled"},
                     }
 

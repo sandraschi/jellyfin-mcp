@@ -122,7 +122,7 @@ async def jellyfin_media(
             if not item_id:
                 raise ValueError("item_id is required for 'update' operation.")
             if not metadata:
-                raise ValueError("metadata is required for 'update' operation — pass a dict of fields to change.")
+                raise ValueError("metadata is required for 'update' operation - pass a dict of fields to change.")
             current = await jf.get_item(item_id)
             current.update(metadata)
             data = await jf.update_item(item_id=item_id, metadata=current)

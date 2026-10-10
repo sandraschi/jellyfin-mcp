@@ -79,7 +79,7 @@ async def jellyfin_subtitle(
             return {
                 "success": True,
                 "operation": "upload",
-                "message": "Subtitle upload requires a file — not supported via MCP text interface",
+                "message": "Subtitle upload requires a file - not supported via MCP text interface",
                 "data": {"item_id": item_id, "language": language},
             }
 

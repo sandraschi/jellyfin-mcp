@@ -87,7 +87,12 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP", "N", "S", "A", "C4", "T20", "RET", "SIM", "ARG", "TRY"]
-ignore = ["E501", "E402", "B008", "TRY003", "TRY300", "TRY301", "TRY400", "TRY401", "ARG001", "ARG002", "A002", "A001", "N802", "N816", "S110", "B904", "SIM105", "UP041"]
+ignore = ["E501", "E402", "B008", "TRY003", "TRY300", "TRY301", "TRY400", "TRY401", "ARG001", "ARG002", "A002", "A001", "N802", "N816", "B904", "SIM105", "UP041"]
+
+[tool.ruff.lint.per-file-ignores]
+# NOTE: this nested config shadows the repo-root pyproject.toml for all files
+# under mcpb/ (ruff walks up from each file). Keep in sync on rule changes.
+"verify_pack.py" = ["T201", "SIM101"]
 
 [tool.ruff.format]
 quote-style = "double"

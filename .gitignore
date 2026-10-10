@@ -48,6 +48,7 @@ Thumbs.db
 *.mcpb
 reports/
 !docs/assess-reports/
+mcpb/uv.lock
 
 # Batch-edit backups (Batch Mutation Safety rule)
 *.bak

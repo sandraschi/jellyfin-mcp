@@ -1,4 +1,4 @@
-"""Jellyfin plugin service — catalog, install, configure."""
+"""Jellyfin plugin service - catalog, install, configure."""
 
 import logging
 

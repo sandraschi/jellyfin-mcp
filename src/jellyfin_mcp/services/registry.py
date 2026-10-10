@@ -1,4 +1,4 @@
-"""Shared service registry — reuse lifespan connections across tool calls."""
+"""Shared service registry - reuse lifespan connections across tool calls."""
 
 from __future__ import annotations
 

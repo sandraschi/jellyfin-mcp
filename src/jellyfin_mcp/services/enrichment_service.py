@@ -1,4 +1,4 @@
-"""Media enrichment service — TMDB, Wikipedia, OMDb metadata augmentation."""
+"""Media enrichment service - TMDB, Wikipedia, OMDb metadata augmentation."""
 
 import logging
 

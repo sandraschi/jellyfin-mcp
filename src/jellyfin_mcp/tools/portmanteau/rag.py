@@ -33,10 +33,10 @@ async def jellyfin_rag(
     {"success": bool, "operation": str, "data": [...], "count": int, "message": str}
 
     ## Examples
-    - jellyfin_rag(operation="sync") — index all current library metadata
+    - jellyfin_rag(operation="sync") - index all current library metadata
     - jellyfin_rag(operation="search", query="dark sci-fi movies with time travel")
-    - jellyfin_rag(operation="status") — check indexed item count
-    - jellyfin_rag(operation="purge") — clear the RAG index
+    - jellyfin_rag(operation="status") - check indexed item count
+    - jellyfin_rag(operation="purge") - clear the RAG index
     """
     try:
         rag = RAGService()
@@ -62,7 +62,7 @@ async def jellyfin_rag(
             return {
                 "success": True,
                 "operation": "sync",
-                "message": f"RAG sync complete — {result.get('indexed', 0)} of {result.get('total', 0)} items indexed",
+                "message": f"RAG sync complete - {result.get('indexed', 0)} of {result.get('total', 0)} items indexed",
                 "data": result,
             }
 
@@ -102,7 +102,7 @@ async def jellyfin_rag(
             return {
                 "success": True,
                 "operation": "purge",
-                "message": "RAG index cleared — run sync to re-index",
+                "message": "RAG index cleared - run sync to re-index",
                 "data": result,
             }
 

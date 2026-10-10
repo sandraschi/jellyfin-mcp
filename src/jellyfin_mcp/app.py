@@ -54,7 +54,7 @@ if _is_stdio_mode:
 
 @asynccontextmanager
 async def _jellyfin_lifespan(app):
-    """FastMCP 3.2 lifespan hook — connect/disconnect Jellyfin."""
+    """FastMCP 3.2 lifespan hook - connect/disconnect Jellyfin."""
     from .config import get_settings
     from .services.jellyfin_service import JellyfinService
     from .services.registry import clear_services, set_jellyfin_service, set_ws_service
@@ -75,7 +75,7 @@ async def _jellyfin_lifespan(app):
             set_jellyfin_service(service)
             app.state.jellyfin_service = service
         else:
-            lifespan_logger.warning("JELLYFIN_API_KEY not set — Jellyfin service unavailable")
+            lifespan_logger.warning("JELLYFIN_API_KEY not set - Jellyfin service unavailable")
     except Exception as e:
         lifespan_logger.warning("Jellyfin service initialization failed: %s", e)
 
@@ -104,7 +104,7 @@ _USE_CLIENT_SAMPLING = os.getenv("JELLYFIN_SAMPLING_USE_CLIENT_LLM", "").lower()
 mcp = FastMCP(
     "JellyfinMCP",
     instructions=(
-        "JellyfinMCP is a FastMCP 3.2+ server for Jellyfin Media Server — the open-source Plex alternative. "
+        "JellyfinMCP is a FastMCP 3.2+ server for Jellyfin Media Server - the open-source Plex alternative. "
         "Portmanteau tools include jellyfin_library, jellyfin_media, jellyfin_search, jellyfin_playback, "
         "jellyfin_user, jellyfin_playlist, jellyfin_server, jellyfin_streaming, jellyfin_plugin, "
         "jellyfin_livetv, jellyfin_subtitle, jellyfin_rag, jellyfin_enrichment, jellyfin_help. "
@@ -130,7 +130,7 @@ Portmanteau: jellyfin_library, jellyfin_media, jellyfin_search, jellyfin_playbac
 jellyfin_playlist, jellyfin_collections, jellyfin_metadata, jellyfin_server, jellyfin_streaming,
 jellyfin_plugin, jellyfin_arr_stack, jellyfin_subtitle, jellyfin_livetv, jellyfin_ffmpeg,
 jellyfin_enrichment, jellyfin_rag, jellyfin_reporting, jellyfin_recommend, jellyfin_help,
-jellyfin_integration, jellyfin_agentic — 22 tools, 120+ operations.
+jellyfin_integration, jellyfin_agentic - 22 tools, 120+ operations.
 
 ## Unique Features (vs Plex)
 - Plugin management (install/configure/uninstall via MCP)
@@ -172,13 +172,13 @@ Use jellyfin_plugin(operation="install", plugin_id="...") to install.
 def jellyfin_quickstart_resource() -> str:
     return """# jellyfin-mcp Quickstart
 
-1. jellyfin_library(operation="list") — list all libraries
-2. jellyfin_media(operation="browse", library_id="...") — browse media
-3. jellyfin_search(operation="search", query="...") — search across libraries
-4. jellyfin_playback(operation="list_sessions") — active playback sessions
-5. jellyfin_plugin(operation="catalog") — available plugins
-6. jellyfin_rag(operation="sync") then jellyfin_rag(operation="search", query="...") — semantic search
-7. jellyfin_help(operation="discover") — all tools and operations
+1. jellyfin_library(operation="list") - list all libraries
+2. jellyfin_media(operation="browse", library_id="...") - browse media
+3. jellyfin_search(operation="search", query="...") - search across libraries
+4. jellyfin_playback(operation="list_sessions") - active playback sessions
+5. jellyfin_plugin(operation="catalog") - available plugins
+6. jellyfin_rag(operation="sync") then jellyfin_rag(operation="search", query="...") - semantic search
+7. jellyfin_help(operation="discover") - all tools and operations
 """
 
 

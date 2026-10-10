@@ -75,7 +75,7 @@ async def jellyfin_enrichment(
             return {
                 "success": True,
                 "operation": operation,
-                "message": f"{operation.upper()} enrichment — provider stub (not yet implemented)",
+                "message": f"{operation.upper()} enrichment - provider stub (not yet implemented)",
                 "data": {"title": title, "source": operation, "results": []},
             }
 
@@ -90,7 +90,7 @@ async def jellyfin_enrichment(
             return {
                 "success": True,
                 "operation": "batch",
-                "message": f"Batch enrichment completed — {len(results)} sources",
+                "message": f"Batch enrichment completed - {len(results)} sources",
                 "data": results,
                 "count": len(results),
             }
