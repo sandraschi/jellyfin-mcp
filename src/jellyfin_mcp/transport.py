@@ -90,7 +90,8 @@ async def run_server_async(mcp_app, args: argparse.Namespace | None = None, serv
     try:
         import httpx
 
-        r = httpx.post(
+        r = await asyncio.to_thread(
+            httpx.post,
             proxy_url,
             json={
                 "jsonrpc": "2.0",
